@@ -4,8 +4,6 @@
 # Visual Studio Code - https://code.visualstudio.com/
 .settings/
 .vscode/
-tsconfig.json
-jsconfig.json
 
 ### macOS ###
 # General
@@ -65,7 +63,29 @@ typings/
 # nuxt.js build output
 .nuxt
 
-package-lock.json
+# ========== back-end ==========
 
-node_server/web_root/back_end/uploads
-node_server/web_root/back_end/post_data
+# ========== front-end ==========
+.DS_Store
+node_modules
+/dist
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
