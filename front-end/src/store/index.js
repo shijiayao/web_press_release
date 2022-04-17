@@ -1,7 +1,14 @@
-import { useStore } from 'vuex'
+import { createStore } from 'vuex';
 
-export default {
-  setup () {
-    const store = useStore()
+const Store = createStore({
+  state() {
+    return {
+      formElementSize: 'large'
+    };
+  },
+  getters: {
+    formElementSize: (state) => state.formElementSize
   }
-}
+});
+
+export default Store;

@@ -3,7 +3,7 @@ import LoginPage from '@/components/login/login-page.vue';
 import LayoutMain from '@/components/layout/layout-main.vue';
 
 const routes = [
-  { path: '/login', component: LoginPage },
+  { path: '/login', component: LoginPage, meta: { title: 'login' } },
   {
     path: '/',
     component: LayoutMain,

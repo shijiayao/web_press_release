@@ -1,27 +1,43 @@
 <template>
-  <section class="layout-main-wrap">
-    <el-container>
-      <el-header>
-        <layoutHeader></layoutHeader>
-      </el-header>
-      <el-container>
-        <el-aside width="200px">
-          <layoutLefNav></layoutLefNav>
-        </el-aside>
-        <el-main>Main</el-main>
-      </el-container>
-    </el-container>
+  <section class="layout-lef-nav-wrap">
+    <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+      <el-sub-menu index="1">
+        <template #title>
+          <el-icon><location /></el-icon>
+          <span>Navigator One</span>
+        </template>
+        <el-menu-item-group title="Group One">
+          <el-menu-item index="1-1">item one</el-menu-item>
+          <el-menu-item index="1-2">item one</el-menu-item>
+        </el-menu-item-group>
+        <el-menu-item-group title="Group Two">
+          <el-menu-item index="1-3">item three</el-menu-item>
+        </el-menu-item-group>
+        <el-sub-menu index="1-4">
+          <template #title>item four</template>
+          <el-menu-item index="1-4-1">item one</el-menu-item>
+        </el-sub-menu>
+      </el-sub-menu>
+      <el-menu-item index="2">
+        <el-icon><icon-menu /></el-icon>
+        <span>Navigator Two</span>
+      </el-menu-item>
+      <el-menu-item index="3" disabled>
+        <el-icon><document /></el-icon>
+        <span>Navigator Three</span>
+      </el-menu-item>
+      <el-menu-item index="4">
+        <el-icon><setting /></el-icon>
+        <span>Navigator Four</span>
+      </el-menu-item>
+    </el-menu>
   </section>
 </template>
 
 <script>
-import layoutHeader from './layout-header.vue';
-import layoutLefNav from './layout-lef-nav.vue';
-import { getNavList } from '@/api/api.js';
-
 export default {
-  name: 'layout-main',
-  components: { layoutHeader, layoutLefNav },
+  name: 'layout-lef-nav',
+  components: {},
   props: {},
   data() {
     return {};
@@ -33,8 +49,6 @@ export default {
   },
   created() {
     // 在实例创建完成后被立即同步调用。在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。然而，挂载阶段还没开始，且 el property 目前尚不可用。
-
-    getNavList();
   },
   beforeMount() {
     // 在挂载开始之前被调用：相关的 render 函数首次被调用。
