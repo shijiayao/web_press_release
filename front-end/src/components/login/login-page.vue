@@ -67,7 +67,7 @@ export default {
   props: {},
   data() {
     return {
-      activeName: 'register',
+      activeName: 'login',
       loginForm: { username: '', password: '' },
       registerForm: { username: '', password: '', confirmPassword: '', nickname: '', email: '', mobile: '', fullname: '', gender: -1 }
     };

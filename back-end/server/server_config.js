@@ -93,7 +93,7 @@ class ServerApp {
 
     // headers 参数
     let ResponseHeadersConfig = {
-      'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, yourHeaderFeild',
+      'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, yourHeaderFeild, X-Void-Risk, Authorization',
       'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS',
       'Access-Control-Allow-Origin': '*'
     };
@@ -131,7 +131,7 @@ class ServerApp {
 
       if (path.indexOf('/api') === 0) {
         controller[String(path).replace(/-/g, '_')](query, (err, data) => {
-          response.json({ code: 404, message: 'succes', result: { data: JSON.parse(data) } });
+          response.json({ code: 200, message: 'succes', data: JSON.parse(data) });
         });
       } else {
         response.json({ code: 404, message: 'Not Found!', result: {} });

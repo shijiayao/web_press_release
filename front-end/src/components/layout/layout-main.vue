@@ -1,14 +1,10 @@
 <template>
   <section class="layout-main-wrap">
-    <el-container>
-      <el-header>
-        <layoutHeader></layoutHeader>
-      </el-header>
+    <el-container class="layout-main-container">
+      <el-header><layoutHeader></layoutHeader></el-header>
       <el-container>
-        <el-aside width="200px">
-          <layoutLefNav></layoutLefNav>
-        </el-aside>
-        <el-main>Main</el-main>
+        <el-aside width="240px"><layoutLefNav></layoutLefNav></el-aside>
+        <el-main><router-view></router-view></el-main>
       </el-container>
     </el-container>
   </section>
@@ -17,7 +13,6 @@
 <script>
 import layoutHeader from './layout-header.vue';
 import layoutLefNav from './layout-lef-nav.vue';
-import { getNavList } from '@/api/api.js';
 
 export default {
   name: 'layout-main',
@@ -33,8 +28,6 @@ export default {
   },
   created() {
     // 在实例创建完成后被立即同步调用。在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。然而，挂载阶段还没开始，且 el property 目前尚不可用。
-
-    getNavList();
   },
   beforeMount() {
     // 在挂载开始之前被调用：相关的 render 函数首次被调用。
@@ -58,4 +51,28 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.layout-main-wrap {
+  width: 100%;
+  height: 100%;
+
+  .layout-main-container {
+    width: 100%;
+    height: 100%;
+
+    .el-header {
+      padding: 0;
+      background-color: #d1edc4;
+    }
+
+    .el-aside {
+      background-color: #515a6e;
+    }
+
+    .el-main {
+      padding: 10px;
+      background-color: #f0f9eb;
+    }
+  }
+}
+</style>

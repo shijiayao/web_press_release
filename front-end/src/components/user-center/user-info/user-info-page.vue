@@ -1,21 +1,26 @@
 <template>
-  <section class="layout-header-wrap">
-    <section class="header-bar">
-      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-      <span class="tips-text">普通用户：</span>
-      <span class="tips-text tips-user">某某某</span>
-      <span class="tips-text">欢迎登录！</span>
-    </section>
+  <section class="user-info-wrap">
+    <el-form :label-position="labelPosition" label-width="100px" :model="formObject" style="max-width: 460px">
+      <el-form-item label="Name">
+        <el-input v-model="formObject.name" />
+      </el-form-item>
+      <el-form-item label="Activity zone">
+        <el-input v-model="formObject.region" />
+      </el-form-item>
+      <el-form-item label="Activity form">
+        <el-input v-model="formObject.type" />
+      </el-form-item>
+    </el-form>
   </section>
 </template>
 
 <script>
 export default {
-  name: 'layout-header',
+  name: 'user-info',
   components: {},
   props: {},
   data() {
-    return {};
+    return { formObject: {} };
   },
   watch: {},
   computed: {},
@@ -47,36 +52,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.layout-header-wrap {
-  height: 100%;
-
-  .header-bar {
-    padding: 8px;
-    font-size: 0;
-
-    .el-avatar {
-      width: 44px;
-      height: 44px;
-      vertical-align: top;
-
-      img {
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    .tips-text {
-      margin-left: 10px;
-      line-height: 44px;
-      font-size: 16px;
-
-      &.tips-user {
-        margin-left: 0;
-        color: #337ecc;
-      }
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

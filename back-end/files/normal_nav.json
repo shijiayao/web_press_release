@@ -1,7 +1,20 @@
 [
-  { "index": 1, "title": "个人信息" },
-  { "index": 2, "title": "修改密码" },
-  { "index": 3, "title": "友情链接" },
-  { "index": 4, "title": "查看评论" },
-  { "index": 5, "title": "浏览新闻" }
+  {
+    "index": 1,
+    "title": "用户中心",
+    "child": [
+      { "index": 1, "title": "个人信息" },
+      { "index": 2, "title": "修改密码" }
+    ]
+  },
+  {
+    "index": 2,
+    "title": "公告消息",
+    "child": []
+  },
+  {
+    "index": 3,
+    "title": "新闻资讯",
+    "child": []
+  }
 ]

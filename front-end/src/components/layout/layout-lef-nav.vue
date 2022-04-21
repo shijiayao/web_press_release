@@ -1,46 +1,49 @@
 <template>
   <section class="layout-lef-nav-wrap">
-    <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-      <el-sub-menu index="1">
-        <template #title>
-          <el-icon><location /></el-icon>
-          <span>Navigator One</span>
-        </template>
-        <el-menu-item-group title="Group One">
-          <el-menu-item index="1-1">item one</el-menu-item>
-          <el-menu-item index="1-2">item one</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="Group Two">
-          <el-menu-item index="1-3">item three</el-menu-item>
-        </el-menu-item-group>
-        <el-sub-menu index="1-4">
-          <template #title>item four</template>
-          <el-menu-item index="1-4-1">item one</el-menu-item>
+    <el-menu :default-active="menuActive" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+      <template v-for="nav_level_01 in navList" :key="nav_level_01.name">
+        <el-sub-menu :index="String(nav_level_01.index)" v-if="nav_level_01.children.length > 0">
+          <template #title>
+            <el-icon :size="20" :color="'#fff'">
+              <user v-if="nav_level_01.icon === 'user'"></user>
+              <coordinate v-else-if="nav_level_01.icon === 'coordinate'"></coordinate>
+              <notebook v-else-if="nav_level_01.icon === 'notebook'"></notebook>
+              <message v-else-if="nav_level_01.icon === 'message'"></message>
+              <document v-else-if="nav_level_01.icon === 'document'"></document>
+            </el-icon>
+            <span>{{ nav_level_01.title }}</span>
+          </template>
+          <el-menu-item v-for="nav_level_02 in nav_level_01.children" :key="nav_level_02.name" :index="nav_level_01.index + '-' + nav_level_02.index">
+            <router-link class="nav-link" :to="nav_level_02.path">{{ nav_level_02.title }}</router-link>
+          </el-menu-item>
         </el-sub-menu>
-      </el-sub-menu>
-      <el-menu-item index="2">
-        <el-icon><icon-menu /></el-icon>
-        <span>Navigator Two</span>
-      </el-menu-item>
-      <el-menu-item index="3" disabled>
-        <el-icon><document /></el-icon>
-        <span>Navigator Three</span>
-      </el-menu-item>
-      <el-menu-item index="4">
-        <el-icon><setting /></el-icon>
-        <span>Navigator Four</span>
-      </el-menu-item>
+        <el-menu-item v-else :index="String(nav_level_01.index)">
+          <el-icon :size="20" :color="'#fff'">
+            <user v-if="nav_level_01.icon === 'user'"></user>
+            <coordinate v-else-if="nav_level_01.icon === 'coordinate'"></coordinate>
+            <notebook v-else-if="nav_level_01.icon === 'notebook'"></notebook>
+            <message v-else-if="nav_level_01.icon === 'message'"></message>
+            <document v-else-if="nav_level_01.icon === 'document'"></document>
+          </el-icon>
+          <router-link class="nav-link" :to="nav_level_01.path">{{ nav_level_01.title }}</router-link>
+        </el-menu-item>
+      </template>
     </el-menu>
   </section>
 </template>
 
 <script>
+import navList from '@/router/nav-list.js';
+
 export default {
   name: 'layout-lef-nav',
   components: {},
   props: {},
   data() {
-    return {};
+    return {
+      menuActive: '5001-1',
+      navList
+    };
   },
   watch: {},
   computed: {},
@@ -68,8 +71,75 @@ export default {
   unmounted() {
     // 实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的事件监听器被移除，所有的子实例也都被销毁。
   },
-  methods: {}
+  methods: {
+    handleOpen() {},
+    handleClose() {}
+  }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.layout-lef-nav-wrap {
+  height: 100%;
+
+  :deep {
+    .el-menu {
+      background-color: transparent;
+      border: none;
+
+      .el-sub-menu__title {
+        &:hover {
+          background-color: #414858;
+        }
+      }
+
+      .el-menu--inline {
+        background-color: #363e4f;
+      }
+
+      .el-menu-item {
+        &:hover {
+          background-color: #414858;
+        }
+      }
+
+      .el-sub-menu__title {
+        font-size: 16px;
+        color: #fff;
+      }
+
+      .el-icon {
+        color: #fff;
+      }
+
+      .nav-link {
+        font-size: 16px;
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .is-active.is-opened {
+        .el-sub-menu__title {
+          .el-icon {
+            color: #ffd04b;
+          }
+
+          span {
+            color: #ffd04b;
+          }
+        }
+      }
+
+      .is-active:not(.is-opened) {
+        .el-icon {
+          color: #ffd04b;
+        }
+
+        .nav-link {
+          color: #ffd04b;
+        }
+      }
+    }
+  }
+}
+</style>
