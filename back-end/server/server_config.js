@@ -8,7 +8,8 @@ const mime = require('mime'); // 文件 mime 类型
 const compression = require('compression'); // 服务端 GZip 压缩
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的表单数据 node.js 中间件，它主要用于上传文件。注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
 
-const controller = require('../controller/index.js');
+const Api = require('../controller/api/index.js');
+const { verification } = require('../controller/verification/common-param.js');
 
 /**
  * 本地服务器构造函数
@@ -126,15 +127,31 @@ class ServerApp {
     _this.app.use(express.urlencoded({ limit: '100mb', extended: false }));
 
     _this.app.use('/', (request, response) => {
-      const { method, path, query, body } = request;
-      console.log(method, path, query, body);
+      const { headers, method, path, query, body } = request;
+      const apiMethod = Api[String(path).replace(/-/g, '_')];
 
-      if (path.indexOf('/api') === 0) {
-        controller[String(path).replace(/-/g, '_')](query, (err, data) => {
-          response.json({ code: 200, message: 'succes', data: JSON.parse(data) });
+      if (!verification({ path, nonce: query.nonce, ts: query.ts, s: query.s })) {
+        // 校验公共参数未通过
+        response.status(412).json({ code: 412, message: path + ' Precondition Failed!', result: {} });
+      } else if (path.indexOf('/api') === 0 && apiMethod) {
+        apiMethod({ headers, method, path, query, body }, (error, success) => {
+          /**
+           * code
+           * 10001 缺少字段
+           * 10002 注册字段已存在
+           * 10003 数据库报错
+           * 10004 token 过期
+           * 10005 用户信息异常或者未查询到用户信息
+           */
+
+          if (error.code) {
+            response.json({ code: error.code, message: error.message, data: error.data || {} });
+          } else {
+            response.json({ code: success.code, message: success.message, data: success.data || {} });
+          }
         });
       } else {
-        response.json({ code: 404, message: 'Not Found!', result: {} });
+        response.status(404).json({ code: 404, message: path + ' Not Found!', result: {} });
       }
     });
   }

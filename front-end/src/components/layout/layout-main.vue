@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import layoutHeader from './layout-header.vue';
 import layoutLefNav from './layout-lef-nav.vue';
 
@@ -21,8 +22,17 @@ export default {
   data() {
     return {};
   },
-  watch: {},
-  computed: {},
+  watch: {
+    isLogin: {
+      handler(val) {
+        if (val) {
+          this.$store.dispatch('getUserInfo');
+        }
+      },
+      immediate: true
+    }
+  },
+  computed: { ...mapGetters(['isLogin']) },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
   },
@@ -62,7 +72,7 @@ export default {
 
     .el-header {
       padding: 0;
-      background-color: #d1edc4;
+      background-color: #c6e2ff;
     }
 
     .el-aside {
@@ -71,7 +81,7 @@ export default {
 
     .el-main {
       padding: 10px;
-      background-color: #f0f9eb;
+      background-color: #d1edc4;
     }
   }
 }

@@ -41,7 +41,7 @@ export default {
   props: {},
   data() {
     return {
-      menuActive: '5001-1',
+      menuActive: '10001-1',
       navList
     };
   },

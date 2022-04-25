@@ -1,7 +1,7 @@
 export default [
   // 公用组
   {
-    index: 5001,
+    index: 10001,
     title: '用户中心',
     name: 'user-center',
     path: '/user-center',
@@ -15,7 +15,7 @@ export default [
   },
   // 管理员用户组
   {
-    index: 2002,
+    index: 7002,
     title: '用户管理',
     name: 'user-manage',
     path: '/user-manage',
@@ -28,7 +28,7 @@ export default [
     ]
   },
   {
-    index: 2003,
+    index: 7003,
     title: '内容管理',
     name: 'content-manage',
     path: '/content-manage',
@@ -44,7 +44,7 @@ export default [
   },
   // 普通用户组
   {
-    index: 1002,
+    index: 2002,
     title: '公告消息',
     name: 'notice-message',
     path: '/notice-message',
@@ -53,7 +53,7 @@ export default [
     children: []
   },
   {
-    index: 1003,
+    index: 2003,
     title: '新闻资讯',
     name: 'news-info',
     path: '/news-info',

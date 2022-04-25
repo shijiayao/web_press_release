@@ -2,14 +2,16 @@
   <section class="layout-header-wrap">
     <section class="header-bar">
       <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-      <span class="tips-text">普通用户：</span>
-      <span class="tips-text tips-user">某某某</span>
+      <span class="tips-text">{{ userLevel }}：</span>
+      <span class="tips-text tips-user">{{ userInfo.nickname }}</span>
       <span class="tips-text">欢迎登录！</span>
     </section>
   </section>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'layout-header',
   components: {},
@@ -18,7 +20,12 @@ export default {
     return {};
   },
   watch: {},
-  computed: {},
+  computed: {
+    ...mapGetters(['userInfo']),
+    userLevel() {
+      return this.userInfo.level < 7000 ? '普通用户' : '管理员';
+    }
+  },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
   },
@@ -74,7 +81,7 @@ export default {
 
       &.tips-user {
         margin-left: 0;
-        color: #337ecc;
+        color: #b88230;
       }
     }
   }

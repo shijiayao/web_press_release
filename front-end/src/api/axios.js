@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ElMessage } from 'element-plus';
 import MD5 from 'js-md5';
 
 const Axios = axios.create({
@@ -15,9 +16,9 @@ Axios.interceptors.request.use(
     config.params.ts = new Date().getTime(); // 时间戳
     config.params.s = MD5(`${config.url}~${config.params.nonce}${config.params.ts}`); // 签名
 
-    if (localStorage.getItem('user_token')) {
+    if (sessionStorage.getItem('user_token')) {
       // 给请求头中添加 Authorization 请求头：
-      config.headers.Authorization = JSON.parse(localStorage.getItem('user_token')).token;
+      config.headers.Authorization = sessionStorage.getItem('user_token');
     }
 
     // 开发、测试环境
@@ -42,6 +43,10 @@ Axios.interceptors.response.use(
   function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    const { data, status } = error.response;
+
+    ElMessage.error(`${status} - ${data.message}`);
+
     return Promise.reject(error);
   }
 );

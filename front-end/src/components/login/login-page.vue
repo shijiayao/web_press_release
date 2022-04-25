@@ -4,42 +4,42 @@
       <section class="tabs-box">
         <el-tabs v-model="activeName">
           <el-tab-pane label="登录" name="login">
-            <el-form :model="loginForm">
-              <el-form-item :size="formElementSize">
+            <el-form :model="loginForm" :size="formElementSize">
+              <el-form-item>
                 <el-input v-model="loginForm.username" placeholder="请输入用户名/手机/邮箱"></el-input>
               </el-form-item>
-              <el-form-item :size="formElementSize">
+              <el-form-item>
                 <el-input v-model="loginForm.password" placeholder="请输入登录密码" type="password"></el-input>
               </el-form-item>
             </el-form>
             <section class="button-group">
-              <el-button type="primary" :size="formElementSize">登 录</el-button>
+              <el-button type="primary" @click="loginButton" :size="formElementSize">登 录</el-button>
             </section>
           </el-tab-pane>
           <el-tab-pane label="注册" name="register">
-            <el-form :model="registerForm" label-width="100px">
-              <el-form-item label="账号" :size="formElementSize">
+            <el-form :model="registerForm" label-width="100px" :size="formElementSize">
+              <el-form-item label="账号">
                 <el-input v-model="registerForm.username" placeholder="请输入账号"></el-input>
               </el-form-item>
-              <el-form-item label="登录密码" :size="formElementSize">
+              <el-form-item label="登录密码">
                 <el-input v-model="registerForm.password" placeholder="请输入登录密码" type="password"></el-input>
               </el-form-item>
-              <el-form-item label="确认密码" :size="formElementSize">
+              <el-form-item label="确认密码">
                 <el-input v-model="registerForm.confirmPassword" placeholder="请输入确认密码" type="password"></el-input>
               </el-form-item>
-              <el-form-item label="昵称" :size="formElementSize">
+              <el-form-item label="昵称">
                 <el-input v-model="registerForm.nickname" placeholder="请输入昵称，最多可以输入12个字符" minlength="2" maxlength="12"></el-input>
               </el-form-item>
-              <el-form-item label="邮箱" :size="formElementSize">
+              <el-form-item label="邮箱">
                 <el-input v-model="registerForm.email" placeholder="请输入邮箱，例：example@xxx.xx"></el-input>
               </el-form-item>
-              <el-form-item label="手机号" :size="formElementSize">
+              <el-form-item label="手机号">
                 <el-input v-model="registerForm.mobile" placeholder="请输入手机号，例：13812345678" maxlength="11"></el-input>
               </el-form-item>
-              <el-form-item label="姓名" :size="formElementSize">
+              <el-form-item label="姓名">
                 <el-input v-model="registerForm.fullname" placeholder="请输入姓名"></el-input>
               </el-form-item>
-              <el-form-item label="性别" :size="formElementSize">
+              <el-form-item label="性别">
                 <el-select v-model="registerForm.gender">
                   <el-option label="请选择性别" :value="-1"></el-option>
                   <el-option label="女" :value="0"></el-option>
@@ -48,8 +48,8 @@
               </el-form-item>
             </el-form>
             <section class="button-group">
-              <el-button type="warning" :size="formElementSize">重 置</el-button>
-              <el-button type="primary" :size="formElementSize">注 册</el-button>
+              <el-button type="warning" :size="formElementSize" @click="resetRegisterButton">重 置</el-button>
+              <el-button type="primary" :size="formElementSize" @click="registerButton">注 册</el-button>
             </section>
           </el-tab-pane>
         </el-tabs>
@@ -60,6 +60,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { ElMessage } from 'element-plus';
+import { register, login } from '@/api/api.js';
 
 export default {
   name: 'login-page',
@@ -100,7 +102,110 @@ export default {
   unmounted() {
     // 实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的事件监听器被移除，所有的子实例也都被销毁。
   },
-  methods: {}
+  methods: {
+    // 登录按钮
+    loginButton() {
+      const _this = this;
+
+      const loginForm = _this.loginForm;
+
+      if (!loginForm.username) {
+        ElMessage.error('请输入用户名');
+
+        return;
+      }
+
+      if (!loginForm.password) {
+        ElMessage.error('请输入密码');
+
+        return;
+      }
+
+      login(loginForm).then((response) => {
+        const { code, message, data } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          sessionStorage.setItem('user_token', data.token);
+          _this.$router.push('/user-center/user-info');
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // 重置注册按钮
+    resetRegisterButton() {
+      const _this = this;
+
+      _this.registerForm = { username: '', password: '', confirmPassword: '', nickname: '', email: '', mobile: '', fullname: '', gender: -1 };
+    },
+    // 注册按钮
+    registerButton() {
+      const _this = this;
+
+      const registerForm = _this.registerForm;
+
+      if (!registerForm.username) {
+        ElMessage.error('请输入账号');
+
+        return;
+      }
+
+      if (!registerForm.password) {
+        ElMessage.error('请输入密码');
+
+        return;
+      }
+
+      if (registerForm.password !== registerForm.confirmPassword) {
+        ElMessage.error('两次输入的密码不一致');
+
+        return;
+      }
+
+      if (!registerForm.nickname) {
+        ElMessage.error('请输入昵称');
+
+        return;
+      }
+
+      if (!registerForm.email) {
+        ElMessage.error('请输入邮箱');
+
+        return;
+      }
+
+      if (!registerForm.mobile) {
+        ElMessage.error('请输入手机号码');
+
+        return;
+      }
+
+      if (!registerForm.fullname) {
+        ElMessage.error('请输入姓名');
+
+        return;
+      }
+
+      if (registerForm.gender === -1) {
+        ElMessage.error('请选择性别');
+
+        return;
+      }
+
+      register(registerForm).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          _this.activeName = 'login';
+          _this.resetRegisterButton();
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    }
+  }
 };
 </script>
 

@@ -1,29 +1,55 @@
 <template>
   <section class="user-info-wrap">
+    <h3 class="title">用户信息</h3>
     <el-form :label-position="labelPosition" label-width="100px" :model="formObject" style="max-width: 460px">
-      <el-form-item label="Name">
-        <el-input v-model="formObject.name" />
+      <el-form-item label="昵称:">
+        <section class="item-inner">{{ userInfo.nickname }}</section>
       </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-input v-model="formObject.region" />
+      <el-form-item label="用户:">
+        <section class="item-inner">{{ userLevel }}</section>
       </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="formObject.type" />
+      <el-form-item label="账号:">
+        <section class="item-inner">{{ userInfo.username }}</section>
+      </el-form-item>
+      <el-form-item label="手机号:">
+        <section class="item-inner">{{ userInfo.mobile }}</section>
+      </el-form-item>
+      <el-form-item label="email:">
+        <section class="item-inner">{{ userInfo.email }}</section>
+      </el-form-item>
+      <el-form-item label="姓名:">
+        <section class="item-inner">{{ userInfo.fullname }}</section>
+      </el-form-item>
+      <el-form-item label="性别:">
+        <section class="item-inner">{{ userGender }}</section>
+      </el-form-item>
+      <el-form-item label="创建时间:">
+        <section class="item-inner">{{ new Date(userInfo.create_time).toLocaleString() }}</section>
       </el-form-item>
     </el-form>
   </section>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'user-info',
   components: {},
   props: {},
   data() {
-    return { formObject: {} };
+    return { formObject: { username: '', password: '', confirmPassword: '', nickname: '', email: '', mobile: '', fullname: '', gender: -1 } };
   },
   watch: {},
-  computed: {},
+  computed: {
+    ...mapGetters(['userInfo']),
+    userLevel() {
+      return this.userInfo.level < 7000 ? '普通用户' : '管理员';
+    },
+    userGender() {
+      return this.userInfo.gender === 0 ? '女' : '男';
+    }
+  },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
   },
@@ -52,4 +78,32 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.user-info-wrap {
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
+
+  .title {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #222;
+    border-bottom: 2px solid #e4e7ed;
+  }
+
+  .el-form {
+    :deep {
+      .el-form-item__label {
+        font-size: 16px;
+        color: #222;
+      }
+
+      .item-inner {
+        font-size: 16px;
+        color: #888;
+      }
+    }
+  }
+}
+</style>
