@@ -19,13 +19,9 @@ export default [
     title: '用户管理',
     name: 'user-manage',
     path: '/user-manage',
-    redirect: '/user-manage/user-normal',
     icon: 'coordinate',
-    component: () => import('@/components/layout/layout-router-view.vue'),
-    children: [
-      { index: 1, title: '普通用户信息', name: 'user-normal', path: '/user-manage/user-normal', component: () => import('@/components/user-manage/user-normal/user-normal-page.vue'), children: [] },
-      { index: 2, title: '管理员信息', name: 'user-admin', path: '/user-manage/user-admin', component: () => import('@/components/user-manage/user-admin/user-admin-page.vue'), children: [] }
-    ]
+    component: () => import('@/components/user-manage/user-manage-page.vue'),
+    children: []
   },
   {
     index: 7003,

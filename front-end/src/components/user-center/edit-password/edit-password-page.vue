@@ -1,7 +1,7 @@
 <template>
   <section class="edit-password-wrap">
     <h3 class="title">修改密码</h3>
-    <el-form :label-position="labelPosition" label-width="120px" :model="formObject" style="max-width: 460px" :size="formElementSize">
+    <el-form label-width="120px" :model="formObject" style="max-width: 460px" :size="formElementSize">
       <el-form-item label="现在使用的密码">
         <el-input v-model="formObject.password"></el-input>
       </el-form-item>

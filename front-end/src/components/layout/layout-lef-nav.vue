@@ -1,8 +1,8 @@
 <template>
   <section class="layout-lef-nav-wrap">
-    <el-menu :default-active="menuActive" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+    <el-menu :default-active="menuActive" class="el-menu-vertical-demo" @select="menuSelect" :router="true">
       <template v-for="nav_level_01 in navList" :key="nav_level_01.name">
-        <el-sub-menu :index="String(nav_level_01.index)" v-if="nav_level_01.children.length > 0">
+        <el-sub-menu :index="nav_level_01.path" v-if="nav_level_01.children.length > 0" :key="nav_level_01.name">
           <template #title>
             <el-icon :size="20" :color="'#fff'">
               <user v-if="nav_level_01.icon === 'user'"></user>
@@ -13,11 +13,9 @@
             </el-icon>
             <span>{{ nav_level_01.title }}</span>
           </template>
-          <el-menu-item v-for="nav_level_02 in nav_level_01.children" :key="nav_level_02.name" :index="nav_level_01.index + '-' + nav_level_02.index">
-            <router-link class="nav-link" :to="nav_level_02.path">{{ nav_level_02.title }}</router-link>
-          </el-menu-item>
+          <el-menu-item v-for="nav_level_02 in nav_level_01.children" :key="nav_level_02.name" :index="nav_level_02.path">{{ nav_level_02.title }}</el-menu-item>
         </el-sub-menu>
-        <el-menu-item v-else :index="String(nav_level_01.index)">
+        <el-menu-item v-else :index="nav_level_01.path" :key="nav_level_01.name">
           <el-icon :size="20" :color="'#fff'">
             <user v-if="nav_level_01.icon === 'user'"></user>
             <coordinate v-else-if="nav_level_01.icon === 'coordinate'"></coordinate>
@@ -25,7 +23,7 @@
             <message v-else-if="nav_level_01.icon === 'message'"></message>
             <document v-else-if="nav_level_01.icon === 'document'"></document>
           </el-icon>
-          <router-link class="nav-link" :to="nav_level_01.path">{{ nav_level_01.title }}</router-link>
+          <span>{{ nav_level_01.title }}</span>
         </el-menu-item>
       </template>
     </el-menu>
@@ -41,7 +39,7 @@ export default {
   props: {},
   data() {
     return {
-      menuActive: '10001-1',
+      menuActive: '/user-center/user-info',
       navList
     };
   },
@@ -72,8 +70,7 @@ export default {
     // 实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的事件监听器被移除，所有的子实例也都被销毁。
   },
   methods: {
-    handleOpen() {},
-    handleClose() {}
+    menuSelect() {}
   }
 };
 </script>
@@ -98,8 +95,15 @@ export default {
       }
 
       .el-menu-item {
+        font-size: 16px;
+        color: #fff;
+
         &:hover {
           background-color: #414858;
+        }
+
+        &.is-active {
+          color: #ffd04b;
         }
       }
 
@@ -112,13 +116,7 @@ export default {
         color: #fff;
       }
 
-      .nav-link {
-        font-size: 16px;
-        color: #fff;
-        text-decoration: none;
-      }
-
-      .is-active.is-opened {
+      .is-active {
         .el-sub-menu__title {
           .el-icon {
             color: #ffd04b;
@@ -127,16 +125,6 @@ export default {
           span {
             color: #ffd04b;
           }
-        }
-      }
-
-      .is-active:not(.is-opened) {
-        .el-icon {
-          color: #ffd04b;
-        }
-
-        .nav-link {
-          color: #ffd04b;
         }
       }
     }

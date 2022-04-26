@@ -1,3 +1,4 @@
+import Store from '@/store/index.js';
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '@/components/login/login-page.vue';
 import LayoutMain from '@/components/layout/layout-main.vue';
@@ -10,7 +11,7 @@ navList.forEach((element) => {
     name: element.name,
     path: element.path,
     component: element.component,
-    meta: { title: element.title },
+    meta: { title: element.title, keepAlive: false },
     redirect: element.redirect,
     children: formatChildren(element.children)
   });
@@ -24,7 +25,7 @@ function formatChildren(childArray) {
       name: element.name,
       path: element.path,
       component: element.component,
-      meta: { title: element.title },
+      meta: { title: element.title, keepAlive: false },
       children: formatChildren(element.children)
     });
   });
@@ -33,7 +34,7 @@ function formatChildren(childArray) {
 }
 
 const routes = [
-  { name: 'login', path: '/login', component: LoginPage, meta: { title: 'login' } },
+  { name: 'login', path: '/login', component: LoginPage, meta: { title: 'login', keepAlive: false } },
   {
     path: '/',
     component: LayoutMain,
@@ -43,5 +44,11 @@ const routes = [
 ];
 
 const router = createRouter({ history: createWebHistory(), routes });
+
+router.beforeEach(async (to, from, next) => {
+  Store.commit('SET_TOKEN', sessionStorage.getItem('user_token'));
+
+  next();
+});
 
 export default router;

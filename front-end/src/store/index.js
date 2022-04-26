@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import { ElMessage } from 'element-plus';
 import { userInfo } from '../api/api.js';
 
 const Store = createStore({
@@ -22,7 +23,13 @@ const Store = createStore({
   actions: {
     getUserInfo({ commit }) {
       userInfo().then((result) => {
-        console.log(result);
+        const { code, message } = result.data;
+
+        if (code === 200) {
+          commit('SET_USERINFO', result.data.data);
+        } else {
+          ElMessage.error(message);
+        }
 
         commit('SET_USERINFO', result.data.data);
       });

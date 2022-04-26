@@ -1,7 +1,7 @@
 <template>
   <section class="user-info-wrap">
     <h3 class="title">用户信息</h3>
-    <el-form :label-position="labelPosition" label-width="100px" :model="formObject" style="max-width: 460px">
+    <el-form label-width="100px" :model="formObject" style="max-width: 460px">
       <el-form-item label="昵称:">
         <section class="item-inner">{{ userInfo.nickname }}</section>
       </el-form-item>

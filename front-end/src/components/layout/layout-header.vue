@@ -5,12 +5,20 @@
       <span class="tips-text">{{ userLevel }}：</span>
       <span class="tips-text tips-user">{{ userInfo.nickname }}</span>
       <span class="tips-text">欢迎登录！</span>
+      <section class="logout-button">
+        <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" title="确定要退出登录吗?" @confirm="logoutButton">
+          <template #reference>
+            <el-button type="warning" :size="formElementSize">退出登录</el-button>
+          </template>
+        </el-popconfirm>
+      </section>
     </section>
   </section>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import { logout } from '@/api/api.js';
 
 export default {
   name: 'layout-header',
@@ -21,7 +29,7 @@ export default {
   },
   watch: {},
   computed: {
-    ...mapGetters(['userInfo']),
+    ...mapGetters(['formElementSize', 'userInfo']),
     userLevel() {
       return this.userInfo.level < 7000 ? '普通用户' : '管理员';
     }
@@ -50,7 +58,13 @@ export default {
   unmounted() {
     // 实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的事件监听器被移除，所有的子实例也都被销毁。
   },
-  methods: {}
+  methods: {
+    logoutButton() {
+      logout().then((result) => {
+        console.log(result);
+      });
+    }
+  }
 };
 </script>
 
@@ -59,6 +73,7 @@ export default {
   height: 100%;
 
   .header-bar {
+    position: relative;
     padding: 8px;
     font-size: 0;
 
@@ -83,6 +98,12 @@ export default {
         margin-left: 0;
         color: #b88230;
       }
+    }
+
+    .logout-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 }

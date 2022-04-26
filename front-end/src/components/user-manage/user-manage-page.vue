@@ -1,12 +1,12 @@
 <template>
-  <section class="app-wrap">
-    <router-view></router-view>
+  <section class="user-manage-wrap">
+    <section>搜索框</section>
   </section>
 </template>
 
 <script>
 export default {
-  name: 'App',
+  name: 'user-manage',
   components: {},
   props: {},
   data() {
@@ -71,8 +71,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-wrap {
-  width: 100%;
-  height: 100%;
+.user-manage-wrap {
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 5px;
 }
 </style>
