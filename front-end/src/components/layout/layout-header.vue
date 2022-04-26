@@ -1,16 +1,17 @@
 <template>
   <section class="layout-header-wrap">
     <section class="header-bar">
-      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-      <span class="tips-text">{{ userLevel }}：</span>
+      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" v-if="userInfo.level < 20000"></el-avatar>
+      <span class="tips-text" v-if="userInfo.level < 20000">{{ userLevel }}：</span>
       <span class="tips-text tips-user">{{ userInfo.nickname }}</span>
-      <span class="tips-text">欢迎登录！</span>
+      <span class="tips-text">{{ tipsText }}</span>
       <section class="logout-button">
-        <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" title="确定要退出登录吗?" @confirm="logoutButton">
+        <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" title="确定要退出登录吗?" @confirm="logoutButton" v-if="isLogin">
           <template #reference>
             <el-button type="warning" :size="formElementSize">退出登录</el-button>
           </template>
         </el-popconfirm>
+        <el-button v-else :size="formElementSize" @click="$router.push('/login')">登录/注册</el-button>
       </section>
     </section>
   </section>
@@ -18,7 +19,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { logout } from '@/api/api.js';
 
 export default {
   name: 'layout-header',
@@ -29,9 +29,22 @@ export default {
   },
   watch: {},
   computed: {
-    ...mapGetters(['formElementSize', 'userInfo']),
+    ...mapGetters(['formElementSize', 'isLogin', 'userInfo']),
     userLevel() {
-      return this.userInfo.level < 7000 ? '普通用户' : '管理员';
+      let result = '游客';
+
+      if (this.userInfo.level < 1000) {
+        result = '管理员';
+      } else if (this.userInfo.level < 10000) {
+        result = '普通用户';
+      } else {
+        result = '游客';
+      }
+
+      return result;
+    },
+    tipsText() {
+      return this.userInfo.level < 20000 ? '欢迎登录！' : '欢迎光临！';
     }
   },
   beforeCreate() {
@@ -60,8 +73,8 @@ export default {
   },
   methods: {
     logoutButton() {
-      logout().then((result) => {
-        console.log(result);
+      this.$store.dispatch('userLogout').then(() => {
+        this.$router.push('/');
       });
     }
   }
@@ -90,7 +103,7 @@ export default {
     }
 
     .tips-text {
-      margin-left: 10px;
+      margin-left: 5px;
       line-height: 44px;
       font-size: 16px;
 

@@ -22,16 +22,7 @@ export default {
   data() {
     return {};
   },
-  watch: {
-    isLogin: {
-      handler(val) {
-        if (val) {
-          this.$store.dispatch('getUserInfo');
-        }
-      },
-      immediate: true
-    }
-  },
+  watch: {},
   computed: { ...mapGetters(['isLogin']) },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。

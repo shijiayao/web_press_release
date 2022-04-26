@@ -52,3 +52,12 @@ export function editPassword(data) {
     data
   });
 }
+
+// 用户列表
+export function userList(param) {
+  return Axios.request({
+    url: '/api/base-info/user-list',
+    method: 'get',
+    param
+  });
+}

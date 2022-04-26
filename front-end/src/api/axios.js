@@ -1,3 +1,5 @@
+import Store from '@/store/index.js';
+import Router from '@/router/router.js';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import MD5 from 'js-md5';
@@ -37,6 +39,14 @@ Axios.interceptors.response.use(
   function (response) {
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
+
+    const { code } = response.data;
+
+    if (code === 10004) {
+      Store.dispatch('userLogout').then(() => {
+        Router.push('/');
+      });
+    }
 
     return response;
   },

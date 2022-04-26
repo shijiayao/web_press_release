@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import { ElMessage } from 'element-plus';
-import { userInfo } from '../api/api.js';
+import { login, userInfo, logout } from '../api/api.js';
 
 const Store = createStore({
   state() {
@@ -8,7 +8,7 @@ const Store = createStore({
       formElementSize: 'large',
       isLogin: false,
       token: '',
-      userInfo: { level: 1 }
+      userInfo: { level: 20000, nickname: '游客' }
     };
   },
   mutations: {
@@ -21,17 +21,66 @@ const Store = createStore({
     }
   },
   actions: {
-    getUserInfo({ commit }) {
-      userInfo().then((result) => {
-        const { code, message } = result.data;
+    userLogin(context, loginParam) {
+      return new Promise((resolve, reject) => {
+        login(loginParam).then((response) => {
+          const { code, message, data } = response.data;
 
-        if (code === 200) {
-          commit('SET_USERINFO', result.data.data);
+          if (code === 200) {
+            ElMessage.success(message);
+            sessionStorage.setItem('user_token', data.token);
+            context.commit('SET_TOKEN', data.token);
+            context.dispatch('getUserInfo');
+            resolve();
+          } else {
+            ElMessage.error(message);
+            reject();
+          }
+        });
+      });
+    },
+    getUserInfo(context) {
+      return new Promise((resolve, reject) => {
+        if (context.state.isLogin) {
+          userInfo().then((result) => {
+            const { code, message, data } = result.data;
+
+            if (code === 200) {
+              context.commit('SET_USERINFO', data);
+              resolve();
+            } else {
+              ElMessage.error(message);
+              reject();
+            }
+          });
         } else {
-          ElMessage.error(message);
+          reject('用户未登录；未获取到用户 token 缓存');
         }
+      });
+    },
+    userLogout(context, flag) {
+      return new Promise((resolve, reject) => {
+        if (flag) {
+          logout().then((response) => {
+            const { code, message } = response.data;
 
-        commit('SET_USERINFO', result.data.data);
+            if (code === 200) {
+              ElMessage.success(message);
+              sessionStorage.removeItem('user_token');
+              context.commit('SET_TOKEN', null);
+              context.commit('SET_USERINFO', { level: 20000, nickname: '游客' });
+              resolve();
+            } else {
+              ElMessage.error(message);
+              reject();
+            }
+          });
+        } else {
+          sessionStorage.removeItem('user_token');
+          context.commit('SET_TOKEN', null);
+          context.commit('SET_USERINFO', { level: 20000, nickname: '游客' });
+          resolve();
+        }
       });
     }
   },

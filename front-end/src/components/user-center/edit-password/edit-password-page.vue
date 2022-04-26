@@ -3,13 +3,13 @@
     <h3 class="title">修改密码</h3>
     <el-form label-width="120px" :model="formObject" style="max-width: 460px" :size="formElementSize">
       <el-form-item label="现在使用的密码">
-        <el-input v-model="formObject.password"></el-input>
+        <el-input type="password" v-model="formObject.password"></el-input>
       </el-form-item>
       <el-form-item label="新密码">
-        <el-input v-model="formObject.newPassword"></el-input>
+        <el-input type="password" v-model="formObject.newPassword"></el-input>
       </el-form-item>
       <el-form-item label="确认新密码">
-        <el-input v-model="formObject.confirmPassword"></el-input>
+        <el-input type="password" v-model="formObject.confirmPassword"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="editPasswordButton">修改密码</el-button>
@@ -95,7 +95,10 @@ export default {
 
         if (code === 200) {
           ElMessage.success(message);
-          _this;
+
+          _this.$store.dispatch('userLogout').then(() => {
+            _this.$router.push('/login');
+          });
         } else {
           ElMessage.error(message);
         }

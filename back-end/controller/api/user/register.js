@@ -93,7 +93,7 @@ module.exports.register = function (params, callback) {
     mysql_connection.query(
       `INSERT INTO user SET ?`,
       {
-        level: 2000,
+        level: 1000,
         username: data.username,
         password: MD5(data.password),
         nickname: data.nickname,

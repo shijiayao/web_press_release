@@ -11,5 +11,5 @@ module.exports.logout = function (params, callback) {
 
   delete tokenObject[userToken];
 
-  callback({}, { code: 200, message: '已登出', data: {} });
+  callback({}, { code: 200, message: '成功退出登录', data: {} });
 };

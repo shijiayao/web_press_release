@@ -15,6 +15,9 @@
             <section class="button-group">
               <el-button type="primary" @click="loginButton" :size="formElementSize">登 录</el-button>
             </section>
+            <section class="tourist-user">
+              <router-link to="/news-info">===以游客的身份观看新闻===</router-link>
+            </section>
           </el-tab-pane>
           <el-tab-pane label="注册" name="register">
             <el-form :model="registerForm" label-width="100px" :size="formElementSize">
@@ -61,7 +64,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
-import { register, login } from '@/api/api.js';
+import { register } from '@/api/api.js';
 
 export default {
   name: 'login-page',
@@ -121,16 +124,8 @@ export default {
         return;
       }
 
-      login(loginForm).then((response) => {
-        const { code, message, data } = response.data;
-
-        if (code === 200) {
-          ElMessage.success(message);
-          sessionStorage.setItem('user_token', data.token);
-          _this.$router.push('/user-center/user-info');
-        } else {
-          ElMessage.error(message);
-        }
+      _this.$store.dispatch('userLogin', loginForm).then(() => {
+        _this.$router.push('/news-info');
       });
     },
     // 重置注册按钮
@@ -253,6 +248,18 @@ export default {
 
       .button-group {
         text-align: right;
+      }
+
+      .tourist-user {
+        margin: 5px 0;
+
+        a {
+          display: block;
+          padding: 5px 0;
+          text-align: center;
+          color: #409eff;
+          text-shadow: 2px 2px 10px #aaa;
+        }
       }
     }
   }

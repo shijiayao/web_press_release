@@ -1,7 +1,7 @@
 <template>
   <section class="layout-lef-nav-wrap">
     <el-menu :default-active="menuActive" class="el-menu-vertical-demo" @select="menuSelect" :router="true">
-      <template v-for="nav_level_01 in navList" :key="nav_level_01.name">
+      <template v-for="nav_level_01 in menuList" :key="nav_level_01.name">
         <el-sub-menu :index="nav_level_01.path" v-if="nav_level_01.children.length > 0" :key="nav_level_01.name">
           <template #title>
             <el-icon :size="20" :color="'#fff'">
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import navList from '@/router/nav-list.js';
 
 export default {
@@ -39,12 +40,22 @@ export default {
   props: {},
   data() {
     return {
-      menuActive: '/user-center/user-info',
-      navList
+      menuActive: '/news-info',
+      menuList: []
     };
   },
-  watch: {},
-  computed: {},
+  watch: {
+    userInfo: {
+      handler(curVal) {
+        this.menuList = navList.filter((element) => element.level >= curVal.level);
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
   },

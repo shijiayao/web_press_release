@@ -38,7 +38,7 @@ const routes = [
   {
     path: '/',
     component: LayoutMain,
-    redirect: '/user-center/user-info',
+    redirect: '/login',
     children: childrenArray
   }
 ];
@@ -46,7 +46,7 @@ const routes = [
 const router = createRouter({ history: createWebHistory(), routes });
 
 router.beforeEach(async (to, from, next) => {
-  Store.commit('SET_TOKEN', sessionStorage.getItem('user_token'));
+  console.log(Store.state.userInfo);
 
   next();
 });
