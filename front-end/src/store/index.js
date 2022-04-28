@@ -5,7 +5,6 @@ import { login, userInfo, logout } from '../api/api.js';
 const Store = createStore({
   state() {
     return {
-      formElementSize: 'large',
       isLogin: false,
       token: '',
       userInfo: { level: 20000, nickname: '游客' }
@@ -85,7 +84,7 @@ const Store = createStore({
     }
   },
   getters: {
-    formElementSize: (state) => state.formElementSize,
+    token: (state) => state.token,
     isLogin: (state) => state.isLogin,
     userInfo: (state) => state.userInfo
   }

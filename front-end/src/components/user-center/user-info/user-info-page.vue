@@ -44,7 +44,19 @@ export default {
   computed: {
     ...mapGetters(['userInfo']),
     userLevel() {
-      return this.userInfo.level < 7000 ? '普通用户' : '管理员';
+      let result = '游客';
+
+      if (this.userInfo.level === 1) {
+        result = '超级管理员';
+      } else if (this.userInfo.level < 1000) {
+        result = '管理员';
+      } else if (this.userInfo.level < 10000) {
+        result = '普通用户';
+      } else {
+        result = '游客';
+      }
+
+      return result;
     },
     userGender() {
       return this.userInfo.gender === 0 ? '女' : '男';

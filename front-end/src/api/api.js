@@ -27,20 +27,29 @@ export function login(data) {
 }
 
 // 登出
-export function logout(param) {
+export function logout(params) {
   return Axios.request({
     url: '/api/user/logout',
     method: 'get',
-    param
+    params
   });
 }
 
 // 获取用户信息
-export function userInfo(param) {
+export function userInfo(params) {
   return Axios.request({
     url: '/api/user/user-info',
     method: 'get',
-    param
+    params
+  });
+}
+
+// 用户列表
+export function userList(params) {
+  return Axios.request({
+    url: '/api/user/user-list',
+    method: 'get',
+    params
   });
 }
 
@@ -53,11 +62,11 @@ export function editPassword(data) {
   });
 }
 
-// 用户列表
-export function userList(param) {
+// 编辑用户
+export function editUser(data) {
   return Axios.request({
-    url: '/api/base-info/user-list',
-    method: 'get',
-    param
+    url: '/api/user/edit-user',
+    method: 'post',
+    data
   });
 }

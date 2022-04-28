@@ -1,7 +1,7 @@
 <template>
   <section class="edit-password-wrap">
     <h3 class="title">修改密码</h3>
-    <el-form label-width="120px" :model="formObject" style="max-width: 460px" :size="formElementSize">
+    <el-form label-width="120px" :model="formObject" style="max-width: 460px">
       <el-form-item label="现在使用的密码">
         <el-input type="password" v-model="formObject.password"></el-input>
       </el-form-item>
@@ -37,7 +37,7 @@ export default {
     };
   },
   watch: {},
-  computed: { ...mapGetters(['formElementSize', 'userInfo']) },
+  computed: { ...mapGetters(['userInfo']) },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
   },

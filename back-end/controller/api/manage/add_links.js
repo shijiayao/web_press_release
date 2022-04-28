@@ -1,7 +1,7 @@
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
-module.exports.user_list = function (params, callback) {
+module.exports = function (params, callback) {
   let userToken = checkToken(params.headers.authorization);
 
   if (!userToken.status) {
@@ -10,13 +10,9 @@ module.exports.user_list = function (params, callback) {
     return;
   }
 
-  if (userToken.level >= 1000) {
-    callback({}, { code: 10007, message: '用户权限不足', data: {} });
+  let mysqlQueryString = extraTermArray.length > 0 ? `SELECT * FROM user WHERE ${extraTermArray.join(' AND ')}` : 'SELECT * FROM user';
 
-    return;
-  }
-
-  mysql_connection.query(`SELECT * FROM user`, function (error, result) {
+  mysql_connection.query(mysqlQueryString, function (error, result) {
     if (error) {
       console.log('[SELECT ERROR] - ', error.message);
       callback({ code: 10003, message: '[SELECT ERROR] - ', data: { message: error.message } }, {});

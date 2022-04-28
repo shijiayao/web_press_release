@@ -1,7 +1,7 @@
 const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
 
-module.exports.register = function (params, callback) {
+module.exports = function (params, callback) {
   const { body: data } = params;
   let errorFlag = false;
   let code = 200;
@@ -101,7 +101,8 @@ module.exports.register = function (params, callback) {
         mobile: data.mobile,
         fullname: data.fullname,
         gender: data.gender,
-        create_time: new Date()
+        edit_time: new Date().toLocaleString(),
+        create_time: new Date().toLocaleString()
       },
       function (err02, result02) {
         if (err02) {

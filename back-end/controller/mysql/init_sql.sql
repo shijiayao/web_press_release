@@ -9,66 +9,120 @@ CREATE TABLE user (
   mobile varchar(255) NOT NULL,
   fullname varchar(255) NOT NULL,
   gender int NOT NULL,
+  status int NOT NULL,
+  edit_time TIMESTAMP NOT NULL,
   create_time TIMESTAMP NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 INSERT INTO user
 VALUES (
-    0,
+    NULL,
     1,
     'admin',
     MD5('123456'),
-    'admin',
+    '天动万象',
     'admin@email.com',
-    '18812345678',
-    '管理员',
-    0,
+    '18888888888',
+    '钟离',
+    1,
+    1,
+    NOW(),
     NOW()
   ),
   (
-    0,
+    NULL,
     10,
-    'test-admin-01',
+    'admin-01',
     MD5('123456'),
-    'test-admin-01',
-    'test-admin-01@email.com',
+    '梦想真说',
+    'admin-01@email.com',
     '18800001111',
-    '管理员-测试01',
+    '雷电影',
     0,
+    1,
+    NOW(),
     NOW()
   ),
   (
-    0,
+    NULL,
     10,
-    'test-admin-02',
+    'admin-02',
     MD5('123456'),
-    'test-admin-02',
-    'test-admin-02@email.com',
+    '风神之诗',
+    'admin-02@email.com',
     '18800002222',
-    '管理员-测试02',
+    '温迪',
+    0,
     1,
+    NOW(),
     NOW()
   ),
   (
-    0,
+    NULL,
     1000,
-    'test-01',
+    'user-01',
     MD5('123456'),
-    'test-01',
-    'test-01@email.com',
+    '蹦蹦炸弹',
+    'user-01@email.com',
     '18822221111',
-    '普通用户-测试01',
+    '可莉',
     0,
+    1,
+    NOW(),
     NOW()
   ),
   (
-    0,
+    NULL,
     1000,
-    'test-02',
+    'user-02',
     MD5('123456'),
-    'test-02',
-    'test-02@email.com',
+    '万叶之一刀',
+    'user-02@email.com',
     '18822222222',
-    '普通用户-测试02',
+    '枫原万叶',
     1,
+    1,
+    NOW(),
     NOW()
   );
+DROP TABLE IF EXISTS links;
+CREATE TABLE links (
+  id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  link varchar(255) NOT NULL,
+  image varchar(255) NOT NULL,
+  edit_time TIMESTAMP NOT NULL,
+  create_time TIMESTAMP NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+INSERT INTO links
+VALUES (
+    NULL,
+    '明珠号',
+    'https://mzmedia.eastday.com/',
+    '/image/',
+    NOW(),
+    NOW()
+  ),
+  (
+    NULL,
+    '东方资讯',
+    'https://mini.eastday.com/',
+    '/image/',
+    NOW(),
+    NOW()
+  ),
+  (
+    NULL,
+    '百度搜索',
+    'https://www.baidu.com/',
+    '/image/',
+    NOW(),
+    NOW()
+  ),
+  (
+    NULL,
+    '百度翻译',
+    'https://fanyi.baidu.com/',
+    '/image/',
+    NOW(),
+    NOW()
+  )

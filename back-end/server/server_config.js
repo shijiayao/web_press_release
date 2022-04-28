@@ -119,22 +119,56 @@ class ServerApp {
   processingRequests() {
     const _this = this;
 
-    // extended:true 表示使用qs库来解析查询字符串
-    // extended:false 表示使用querystring库来解析字符串
     _this.app.use(express.json());
     _this.app.use(express.raw());
     _this.app.use(express.text());
     _this.app.use(express.urlencoded({ limit: '100mb', extended: false }));
 
-    _this.app.use('/', (request, response) => {
-      const { headers, method, path, query, body } = request;
+    // 上传文件处理
+    // 上传文件使用 multer 中间件，注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
+    let upload = multer({
+      storage: multer.diskStorage({
+        destination(request, file, callback) {
+          callback(null, `./files/image/${file.fieldname}/`);
+        },
+        filename(request, file, callback) {
+          let currentTime = new Date();
+          let YY = ''.concat('0000', currentTime.getFullYear()).slice(-4);
+          let MM = ''.concat('0000', currentTime.getMonth() + 1).slice(-2);
+          let DD = ''.concat('0000', currentTime.getDate()).slice(-2);
+          let HH = ''.concat('0000', currentTime.getHours()).slice(-2);
+          let mm = ''.concat('0000', currentTime.getMinutes()).slice(-2);
+          let ss = ''.concat('0000', currentTime.getSeconds()).slice(-2);
+          let SSS = ''.concat('0000', currentTime.getMilliseconds()).slice(-3);
+
+          let fileType = mime.getExtension(file.mimetype);
+
+          callback(null, `${YY}${MM}${DD}${HH}${mm}${ss}${SSS}.${fileType}`);
+        }
+      }),
+      limits: { fileSize: 20971520 /* 字节 */ },
+      fileFilter(request, file, callback) {
+        // 设置一个函数来控制什么文件可以上传以及什么文件应该跳过
+        const { path, query } = request;
+
+        /image\//.test(file.mimetype) && verification({ path, nonce: query.nonce, ts: query.ts, s: query.s }) ? callback(null, true) : callback(null, false);
+      }
+    }).fields([
+      { name: 'friend-links', maxCount: 1 }, // name 为前端上传文件时使用的 name 属性，是 node 定义的用于接受文件数据的接口参数
+      { name: 'news-info', maxCount: 1 }
+    ]);
+
+    _this.app.use('/', upload, (request, response) => {
+      const { headers, method, path, query, body, files = {} } = request;
       const apiMethod = Api[String(path).replace(/-/g, '_')];
+
+      console.log(Api);
 
       if (!verification({ path, nonce: query.nonce, ts: query.ts, s: query.s })) {
         // 校验公共参数未通过
         response.status(412).json({ code: 412, message: path + ' Precondition Failed!', result: {} });
       } else if (path.indexOf('/api') === 0 && apiMethod) {
-        apiMethod({ headers, method, path, query, body }, (error, success) => {
+        apiMethod({ headers, method, path, query, body, files }, (error, success) => {
           /**
            * code
            * 10001 缺少字段

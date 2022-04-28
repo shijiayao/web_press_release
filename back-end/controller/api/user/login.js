@@ -2,7 +2,7 @@ const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
 const { tokenObject } = require('../../verification/token.js');
 
-module.exports.login = function (params, callback) {
+module.exports = function (params, callback) {
   const {
     body: { username, password }
   } = params;
@@ -19,6 +19,8 @@ module.exports.login = function (params, callback) {
 
     if (result.length <= 0) {
       callback({}, { code: 10004, message: '用户名或者密码不正确', data: {} });
+    } else if (result[0].status !== 1) {
+      callback({}, { code: 10005, message: '该用户处于非正常状态，请联系管理员', data: { token } });
     } else {
       token = MD5(username + today);
       tokenObject[token] = { user_id: result[0].user_id, level: result[0].level, expires: today };

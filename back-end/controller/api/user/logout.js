@@ -1,6 +1,6 @@
 const { tokenObject, checkToken } = require('../../verification/token.js');
 
-module.exports.logout = function (params, callback) {
+module.exports = function (params, callback) {
   let userToken = checkToken(params.headers.authorization);
 
   if (!userToken.status) {

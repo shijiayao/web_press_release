@@ -8,10 +8,10 @@
       <section class="logout-button">
         <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" title="确定要退出登录吗?" @confirm="logoutButton" v-if="isLogin">
           <template #reference>
-            <el-button type="warning" :size="formElementSize">退出登录</el-button>
+            <el-button type="warning">退出登录</el-button>
           </template>
         </el-popconfirm>
-        <el-button v-else :size="formElementSize" @click="$router.push('/login')">登录/注册</el-button>
+        <el-button v-else @click="$router.push('/login')">登录/注册</el-button>
       </section>
     </section>
   </section>
@@ -29,11 +29,13 @@ export default {
   },
   watch: {},
   computed: {
-    ...mapGetters(['formElementSize', 'isLogin', 'userInfo']),
+    ...mapGetters(['isLogin', 'userInfo']),
     userLevel() {
       let result = '游客';
 
-      if (this.userInfo.level < 1000) {
+      if (this.userInfo.level === 1) {
+        result = '超级管理员';
+      } else if (this.userInfo.level < 1000) {
         result = '管理员';
       } else if (this.userInfo.level < 10000) {
         result = '普通用户';

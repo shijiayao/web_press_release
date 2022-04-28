@@ -10,27 +10,19 @@ module.exports = function (params, callback) {
     return;
   }
 
-  mysql_connection.query(`SELECT * FROM user WHERE user_id = ${userToken.user_id}`, function (error, result) {
+  let mysqlQueryString = extraTermArray.length > 0 ? `SELECT * FROM user WHERE ${extraTermArray.join(' AND ')}` : 'SELECT * FROM user';
+
+  mysql_connection.query(mysqlQueryString, function (error, result) {
     if (error) {
       console.log('[SELECT ERROR] - ', error.message);
       callback({ code: 10003, message: '[SELECT ERROR] - ', data: { message: error.message } }, {});
       return;
     }
 
-    if (result.length <= 0) {
-      callback({}, { code: 10005, message: '用户信息异常', data: {} });
-    } else {
-      delete result[0].password;
-      callback(
-        {},
-        {
-          code: 200,
-          message: 'success',
-          data: {
-            ...result[0]
-          }
-        }
-      );
-    }
+    result.forEach((element) => {
+      delete element.password;
+    });
+
+    callback({}, { code: 200, message: 'success', data: result });
   });
 };

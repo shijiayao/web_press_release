@@ -11,7 +11,7 @@ const app = createApp(App);
 
 app.use(Router);
 app.use(Store);
-app.use(ElementPlus);
+app.use(ElementPlus, { size: 'default' });
 
 Object.keys(ElementPlusIcons).forEach((key) => {
   app.component(ElementPlusIcons[key].name, ElementPlusIcons[key]);
