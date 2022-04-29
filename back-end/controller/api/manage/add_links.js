@@ -2,6 +2,7 @@ const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
 module.exports = function (params, callback) {
+  const { body: data } = params;
   let userToken = checkToken(params.headers.authorization);
 
   if (!userToken.status) {
@@ -10,19 +11,31 @@ module.exports = function (params, callback) {
     return;
   }
 
-  let mysqlQueryString = extraTermArray.length > 0 ? `SELECT * FROM user WHERE ${extraTermArray.join(' AND ')}` : 'SELECT * FROM user';
-
-  mysql_connection.query(mysqlQueryString, function (error, result) {
-    if (error) {
-      console.log('[SELECT ERROR] - ', error.message);
-      callback({ code: 10003, message: '[SELECT ERROR] - ', data: { message: error.message } }, {});
-      return;
-    }
-
-    result.forEach((element) => {
-      delete element.password;
-    });
-
-    callback({}, { code: 200, message: 'success', data: result });
+  console.log(data, {
+    name: data.name,
+    link: data.link,
+    image: data.image,
+    edit_time: new Date().toLocaleString(),
+    create_time: new Date().toLocaleString()
   });
+
+  mysql_connection.query(
+    `INSERT INTO links SET ?`,
+    {
+      name: data.name,
+      link: data.link,
+      image: data.image,
+      edit_time: new Date().toLocaleString(),
+      create_time: new Date().toLocaleString()
+    },
+    function (error, result) {
+      if (error) {
+        console.log('[SELECT ERROR] - ', error.message);
+        callback({ code: 10003, message: '[SELECT ERROR] - ', data: { message: error.message } }, {});
+        return;
+      }
+
+      callback({}, { code: 200, message: '新增成功！', data: result });
+    }
+  );
 };

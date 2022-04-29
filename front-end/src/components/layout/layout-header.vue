@@ -1,7 +1,7 @@
 <template>
   <section class="layout-header-wrap">
     <section class="header-bar">
-      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" v-if="userInfo.level < 20000"></el-avatar>
+      <el-avatar src="/image/other/20220429204256584.png" v-if="userInfo.level < 20000"></el-avatar>
       <span class="tips-text" v-if="userInfo.level < 20000">{{ userLevel }}：</span>
       <span class="tips-text tips-user">{{ userInfo.nickname }}</span>
       <span class="tips-text">{{ tipsText }}</span>

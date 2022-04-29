@@ -124,6 +124,9 @@ class ServerApp {
     _this.app.use(express.text());
     _this.app.use(express.urlencoded({ limit: '100mb', extended: false }));
 
+    // 处理静态资源
+    _this.app.use('/image', express.static('./files/image'));
+
     // 上传文件处理
     // 上传文件使用 multer 中间件，注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
     let upload = multer({
@@ -151,6 +154,8 @@ class ServerApp {
         // 设置一个函数来控制什么文件可以上传以及什么文件应该跳过
         const { path, query } = request;
 
+        console.log(request,file);
+
         /image\//.test(file.mimetype) && verification({ path, nonce: query.nonce, ts: query.ts, s: query.s }) ? callback(null, true) : callback(null, false);
       }
     }).fields([
@@ -162,30 +167,30 @@ class ServerApp {
       const { headers, method, path, query, body, files = {} } = request;
       const apiMethod = Api[String(path).replace(/-/g, '_')];
 
-      console.log(Api);
+      if (path.indexOf('/api') === 0 && apiMethod) {
+        if (!verification({ path, nonce: query.nonce, ts: query.ts, s: query.s })) {
+          // 校验公共参数未通过
+          response.status(412).json({ code: 412, message: path + ' Precondition Failed!', result: {} });
+        } else {
+          apiMethod({ headers, method, path, query, body, files }, (error, success) => {
+            /**
+             * code
+             * 10001 缺少字段
+             * 10002 注册字段已存在
+             * 10003 数据库报错
+             * 10004 token 过期
+             * 10005 用户信息异常或者未查询到用户信息
+             * 10006 密码验证未通过
+             * 10007 用户权限不足
+             */
 
-      if (!verification({ path, nonce: query.nonce, ts: query.ts, s: query.s })) {
-        // 校验公共参数未通过
-        response.status(412).json({ code: 412, message: path + ' Precondition Failed!', result: {} });
-      } else if (path.indexOf('/api') === 0 && apiMethod) {
-        apiMethod({ headers, method, path, query, body, files }, (error, success) => {
-          /**
-           * code
-           * 10001 缺少字段
-           * 10002 注册字段已存在
-           * 10003 数据库报错
-           * 10004 token 过期
-           * 10005 用户信息异常或者未查询到用户信息
-           * 10006 密码验证未通过
-           * 10007 用户权限不足
-           */
-
-          if (error.code) {
-            response.json({ code: error.code, message: error.message, data: error.data || {} });
-          } else {
-            response.json({ code: success.code, message: success.message, data: success.data || {} });
-          }
-        });
+            if (error.code) {
+              response.json({ code: error.code, message: error.message, data: error.data || {} });
+            } else {
+              response.json({ code: success.code, message: success.message, data: success.data || {} });
+            }
+          });
+        }
       } else {
         response.status(404).json({ code: 404, message: path + ' Not Found!', result: {} });
       }
@@ -198,7 +203,7 @@ class ServerApp {
 
     // HTTP
     _this.server_http = http.createServer(_this.app).listen(_this.port, () => {
-      console.log(`[${_this.server_http.address().port}] http:${_this.url}:${_this.server_http.address().port}`);
+      console.log(`[${_this.server_http.address().port}] http://${_this.url}:${_this.server_http.address().port}`);
     });
   }
 }

@@ -246,8 +246,7 @@ export default {
     // 编辑用户
     editUserButton(scope) {
       this.editUserDialogVisible = true;
-      this.userRow = { ...scope.row };
-      this.userRow.index = scope.$index;
+      this.userRow = { index: scope.$index, ...scope.row };
     },
     // 恢复用户
     resumeUserButton(row) {
@@ -335,7 +334,16 @@ export default {
       }
 
       if (Object.keys(postData).length > 2) {
-        this.editUserPost(postData);
+        this.editUserPost(postData).then((response) => {
+          const { code, message } = response.data;
+
+          if (code === 200) {
+            ElMessage.success(message);
+            _this.getFriendLinks();
+          } else {
+            ElMessage.error(message);
+          }
+        });
       }
     }
   }

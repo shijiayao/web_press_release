@@ -70,3 +70,30 @@ export function editUser(data) {
     data
   });
 }
+
+// 新增友情链接
+export function addFriendLinks(data) {
+  return Axios.request({
+    url: '/api/manage/add_links',
+    method: 'post',
+    data
+  });
+}
+
+// 获取友情链接列表
+export function friendLinks(params) {
+  return Axios.request({
+    url: '/api/manage/links',
+    method: 'get',
+    params
+  });
+}
+
+// 修改友情链接
+export function editFriendLinks(data) {
+  return Axios.request({
+    url: '/api/manage/edit_links',
+    method: 'post',
+    data
+  });
+}

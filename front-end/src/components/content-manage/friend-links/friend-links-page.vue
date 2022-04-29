@@ -3,47 +3,66 @@
     <section class="head-box">
       <el-input v-model="headForm.name" placeholder="名称" clearable></el-input>
       <el-button type="primary" @click="searchButton">搜索</el-button>
-      <el-button type="success" @click="resetSearchButton">新增友情链接</el-button>
+      <el-button type="success" @click="addLinksButton">新增友情链接</el-button>
     </section>
-    <section>
+    <section class="table-box">
       <el-table size="default" :data="linksList" border style="width: 100%" empty-text="没有数据">
         <el-table-column header-align="center" align="center" label="#" width="60">
           <template #default="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
-        <el-table-column header-align="center" align="left" prop="username" label="名字" width="180"></el-table-column>
-        <el-table-column header-align="center" align="left" prop="nickname" label="链接" width="180"></el-table-column>
-        <el-table-column header-align="center" align="center" prop="gender" label="图片" width="200">
+        <el-table-column header-align="center" align="left" prop="name" label="名称"></el-table-column>
+        <el-table-column header-align="center" align="left" prop="link" label="链接"></el-table-column>
+        <el-table-column header-align="center" align="center" prop="image" label="图片" width="200">
           <template #default="scope">
-            {{ userGender(scope.row) }}
-            <el-upload
-              class="avatar-uploader"
-              :action="uploadImageUrl"
-              :headers="uploadImageHeaders"
-              name="friend-links"
-              :limit="1"
-              :show-file-list="false"
-              list-type="picture"
-              :on-success="imageUploadSuccess"
-              :before-upload="imageUploadBefore"
-            >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus></Plus></el-icon>
-            </el-upload>
+            <img :src="scope.row.image" alt="" class="row-image" />
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" label="操作">
+        <el-table-column header-align="center" align="center" label="操作" width="200">
           <template #default="scope">
-            <section v-if="scope.row.user_id !== 1">
-              <el-button type="primary" @click="editUserButton(scope)">编辑用户</el-button>
-              <el-button type="success" @click="resumeUserButton(scope.row)" v-if="scope.row.status !== 1">恢复用户</el-button>
-              <el-button type="warning" @click="disableUserButton(scope.row)" v-if="scope.row.status === 1">禁用用户</el-button>
-              <el-button type="danger" @click="deleteUserButton(scope.row)" v-if="scope.row.status === 1">删除用户</el-button>
-            </section>
-            <section v-else>超级管理员账户不能被操作</section>
+            <el-button type="primary" @click="editLinksButton(scope)">编辑</el-button>
+            <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" :title="'确定要删除【' + scope.row.name + '】吗?'" @confirm="deleteLinksButton(scope.row)">
+              <template #reference>
+                <el-button type="warning">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
     </section>
+
+    <el-dialog v-model="editLinksDialogVisible" :close-on-click-modal="false" custom-class="edit-links-dialog">
+      <el-form label-width="60px" :model="linksRow" style="max-width: 460px">
+        <el-form-item label="名称:">
+          <el-input v-model="linksRow.name"></el-input>
+        </el-form-item>
+        <el-form-item label="链接:">
+          <el-input v-model="linksRow.link"></el-input>
+        </el-form-item>
+        <el-form-item label="图片:">
+          <img v-if="linksRow.image" :src="linksRow.image" class="links-image" />
+          <el-upload
+            class="avatar-uploader"
+            :action="uploadImageUrl"
+            :headers="uploadImageHeaders"
+            name="friend-links"
+            :limit="1"
+            :show-file-list="false"
+            list-type="picture"
+            :on-success="imageUploadSuccess"
+            :before-upload="imageUploadBefore"
+          >
+            <el-icon class="avatar-uploader-icon"><Plus></Plus></el-icon>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editLinksDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addLinksDialogButton" v-if="dialogMode === 'add'">新增</el-button>
+          <el-button type="primary" @click="editLinksDialogButton" v-else>修改</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -51,6 +70,7 @@
 import MD5 from 'js-md5';
 import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
+import { addFriendLinks, friendLinks, editFriendLinks } from '@/api/api.js';
 
 export default {
   name: 'friend-links',
@@ -58,8 +78,11 @@ export default {
   props: {},
   data() {
     return {
-      headForm: {},
-      linksList: []
+      headForm: { name: '' },
+      linksList: [],
+      linksRow: {},
+      dialogMode: '',
+      editLinksDialogVisible: false
     };
   },
   watch: {},
@@ -90,6 +113,7 @@ export default {
      * 在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。
      * 然而，挂载阶段还没开始，且 el property 目前尚不可用。
      */
+    this.getFriendLinks();
   },
   beforeMount() {
     /**
@@ -132,6 +156,138 @@ export default {
      */
   },
   methods: {
+    // 获取友情链接列表
+    getFriendLinks() {
+      const _this = this;
+
+      friendLinks(_this.headForm).then((response) => {
+        const { code, data, message } = response.data;
+
+        if (code === 200) {
+          _this.linksList = data;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // 搜索按钮
+    searchButton() {
+      this.getFriendLinks();
+    },
+    // 新增友情链接按钮
+    addLinksButton() {
+      this.linksRow = {
+        name: '',
+        link: '',
+        image: ''
+      };
+
+      this.dialogMode = 'add';
+      this.editLinksDialogVisible = true;
+    },
+    // 编辑友情链接按钮
+    editLinksButton(scope) {
+      this.linksRow = { index: scope.$index, ...scope.row };
+      this.dialogMode = 'edit';
+      this.editLinksDialogVisible = true;
+    },
+    // 删除友情链接按钮
+    deleteLinksButton(row) {
+      const _this = this;
+
+      editFriendLinks({ type: 0, id: row.id }).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          _this.getFriendLinks();
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    //  弹出 修改友情链接
+    addLinksDialogButton() {
+      const _this = this;
+      const { name, link, image } = _this.linksRow;
+
+      if (!name) {
+        ElMessage.error('名称不能为空');
+
+        return;
+      }
+
+      if (!link) {
+        ElMessage.error('链接不能为空');
+
+        return;
+      }
+
+      if (!image) {
+        ElMessage.error('请上传图片');
+
+        return;
+      }
+
+      addFriendLinks(_this.linksRow).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          _this.getFriendLinks();
+          _this.editLinksDialogVisible = false;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    //  弹出 修改友情链接
+    editLinksDialogButton() {
+      const _this = this;
+      const { index, id, name, link, image } = _this.linksRow;
+      let postData = {
+        type: 1,
+        id: id
+      };
+
+      if (!name) {
+        ElMessage.error('名称不能为空');
+
+        return;
+      } else if (name !== _this.linksList[index].name) {
+        postData.name = name;
+      }
+
+      if (!link) {
+        ElMessage.error('链接不能为空');
+
+        return;
+      } else if (link !== _this.linksList[index].link) {
+        postData.link = link;
+      }
+
+      if (!image) {
+        ElMessage.error('请上传图片');
+
+        return;
+      } else if (image !== _this.linksList[index].image) {
+        postData.image = image;
+      }
+
+      if (Object.keys(postData).length > 2) {
+        editFriendLinks(postData).then((response) => {
+          const { code, message } = response.data;
+
+          if (code === 200) {
+            ElMessage.success(message);
+            _this.getFriendLinks();
+            _this.editLinksDialogVisible = false;
+          } else {
+            ElMessage.error(message);
+          }
+        });
+      }
+    },
     // 图片上传之前
     imageUploadBefore(file) {
       let result = true;
@@ -149,9 +305,9 @@ export default {
 
       if (code === 10004) {
         ElMessage.error(message);
-        console.log(response);
+        this.$router.push('/');
       } else if (code === 200) {
-        console.log(data);
+        this.linksRow.image = data.url;
         ElMessage.success(message);
       } else {
         ElMessage.error(message);
@@ -180,6 +336,58 @@ export default {
 
     .el-button:last-of-type {
       float: right;
+    }
+  }
+
+  .table-box {
+    .row-image {
+      display: block;
+      margin: 0 auto;
+      height: 40px;
+    }
+  }
+
+  :deep {
+    .edit-links-dialog {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0;
+      transform: translate(-50%, -50%);
+      width: 500px;
+
+      .el-dialog__body {
+        .el-form {
+          .el-form-item:last-of-type {
+            margin-bottom: 0;
+
+            .el-form-item__label {
+              line-height: 40px;
+            }
+          }
+
+          .links-image {
+            margin-right: 5px;
+            height: 40px;
+            vertical-align: top;
+          }
+
+          .avatar-uploader {
+            width: 40px;
+            height: 40px;
+            border: 1px dashed rgb(205, 208, 214);
+
+            &:hover {
+              border-color: #79bbff;
+            }
+
+            .el-upload {
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+      }
     }
   }
 }

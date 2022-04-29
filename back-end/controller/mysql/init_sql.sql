@@ -97,32 +97,32 @@ INSERT INTO links
 VALUES (
     NULL,
     '明珠号',
-    'https://mzmedia.eastday.com/',
-    '/image/',
+    'https://mzmedia.eastday.com',
+    '/image/friend-links/20220429204133393.png',
     NOW(),
     NOW()
   ),
   (
     NULL,
-    '东方资讯',
-    'https://mini.eastday.com/',
-    '/image/',
+    '简书',
+    'https://www.jianshu.com',
+    '/image/friend-links/20220429210213955.png',
     NOW(),
     NOW()
   ),
   (
     NULL,
     '百度搜索',
-    'https://www.baidu.com/',
-    '/image/',
+    'https://www.baidu.com',
+    '/image/friend-links/20220429204334543.png',
     NOW(),
     NOW()
   ),
   (
     NULL,
     '百度翻译',
-    'https://fanyi.baidu.com/',
-    '/image/',
+    'https://fanyi.baidu.com',
+    '/image/friend-links/20220429204355252.png',
     NOW(),
     NOW()
   )

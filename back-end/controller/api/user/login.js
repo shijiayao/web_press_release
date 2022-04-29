@@ -15,7 +15,7 @@ module.exports = function (params, callback) {
     }
 
     let token = '';
-    let today = new Date(new Date().setHours(0, 0, 0, 0) + 24 * 60 * 60 * 1000).getTime();
+    let today = new Date(new Date().setHours(0, 0, 0, 0) + 7 * 24 * 60 * 60 * 1000).getTime();
 
     if (result.length <= 0) {
       callback({}, { code: 10004, message: '用户名或者密码不正确', data: {} });

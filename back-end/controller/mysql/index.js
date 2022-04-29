@@ -11,7 +11,16 @@ mysql_connection.query('SELECT * FROM user', function (err, result) {
     return;
   }
 
-  console.log(`user 正常\n`);
+  console.log(`user 正常`);
+});
+
+mysql_connection.query('SELECT * FROM links', function (err, result) {
+  if (err) {
+    console.log('[SELECT ERROR] - ', err.message);
+    return;
+  }
+
+  console.log(`links 正常`);
 });
 
 module.exports = {
