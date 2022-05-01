@@ -1,13 +1,5 @@
 import Axios from './axios.js';
 
-// 获取 nav list
-export function getNavList() {
-  return Axios.request({
-    url: '/api/base-info/nav-list',
-    method: 'get'
-  });
-}
-
 // 注册
 export function register(data) {
   return Axios.request({
@@ -44,6 +36,15 @@ export function userInfo(params) {
   });
 }
 
+// 新增用户
+export function addUser(data) {
+  return Axios.request({
+    url: '/api/user/add_user',
+    method: 'post',
+    data
+  });
+}
+
 // 用户列表
 export function userList(params) {
   return Axios.request({
@@ -74,16 +75,16 @@ export function editUser(data) {
 // 新增友情链接
 export function addFriendLinks(data) {
   return Axios.request({
-    url: '/api/manage/add_links',
+    url: '/api/manage/add-links',
     method: 'post',
     data
   });
 }
 
 // 获取友情链接列表
-export function friendLinks(params) {
+export function friendLinksList(params) {
   return Axios.request({
-    url: '/api/manage/links',
+    url: '/api/manage/links-list',
     method: 'get',
     params
   });
@@ -92,7 +93,88 @@ export function friendLinks(params) {
 // 修改友情链接
 export function editFriendLinks(data) {
   return Axios.request({
-    url: '/api/manage/edit_links',
+    url: '/api/manage/edit-links',
+    method: 'post',
+    data
+  });
+}
+
+// 新增公共消息
+export function addNotice(data) {
+  return Axios.request({
+    url: '/api/manage/add-notice',
+    method: 'post',
+    data
+  });
+}
+
+// 获取公告消息列表
+export function noticeList(params) {
+  return Axios.request({
+    url: '/api/manage/notice-list',
+    method: 'get',
+    params
+  });
+}
+
+// 编辑公告消息
+export function editNotice(data) {
+  return Axios.request({
+    url: '/api/manage/edit-notice',
+    method: 'post',
+    data
+  });
+}
+
+// 新增新闻分类
+export function addNewsType(data) {
+  return Axios.request({
+    url: '/api/manage/add-news-type',
+    method: 'post',
+    data
+  });
+}
+
+// 获取新闻分类列表
+export function newsTypeList(params) {
+  return Axios.request({
+    url: '/api/manage/news-type-list',
+    method: 'get',
+    params
+  });
+}
+
+// 编辑新闻分类
+export function editNewsType(data) {
+  return Axios.request({
+    url: '/api/manage/edit-news-type',
+    method: 'post',
+    data
+  });
+}
+
+// 新增新闻
+export function addNews(data) {
+  return Axios.request({
+    url: '/api/manage/add-news',
+    method: 'post',
+    data
+  });
+}
+
+// 获取新闻列表
+export function newsList(params) {
+  return Axios.request({
+    url: '/api/manage/news-list',
+    method: 'get',
+    params
+  });
+}
+
+// 编辑新闻
+export function editNews(data) {
+  return Axios.request({
+    url: '/api/manage/edit-news',
     method: 'post',
     data
   });

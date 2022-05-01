@@ -1,7 +1,7 @@
 <template>
   <section class="user-manage-wrap">
     <section class="head-box">
-      <el-input v-model="headForm.name" placeholder="用户名|邮箱|手机号" clearable></el-input>
+      <el-input v-model="headForm.name" placeholder="用户名/邮箱/手机号" clearable></el-input>
       <p class="label-text">用户组</p>
       <el-select v-model="headForm.userGroup">
         <el-option v-for="item in userGroup" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -10,11 +10,13 @@
       <el-select v-model="headForm.userStatus">
         <el-option v-for="item in userStatus" :key="item.value" :label="item.label" :value="item.value"></el-option>
       </el-select>
-      <el-button type="primary" @click="searchButton">搜索</el-button>
-      <el-button type="warning" @click="resetSearchButton">重置搜索条件</el-button>
+      <el-button type="primary" @click="headSearchButton">搜索</el-button>
+      <el-button type="warning" @click="headResetButton">重置搜索条件</el-button>
+      <el-button type="success" @click="headAddButton">新增用户</el-button>
     </section>
+
     <section class="table-box">
-      <el-table size="default" :data="userList" border style="width: 100%" empty-text="没有数据">
+      <el-table size="default" :data="tableData" border style="width: 100%" empty-text="没有数据">
         <el-table-column header-align="center" align="center" label="#" width="60">
           <template #default="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
@@ -39,10 +41,10 @@
         <el-table-column header-align="center" align="center" label="操作">
           <template #default="scope">
             <section v-if="scope.row.user_id !== 1">
-              <el-button type="primary" @click="editUserButton(scope)">编辑用户</el-button>
-              <el-button type="success" @click="resumeUserButton(scope.row)" v-if="scope.row.status !== 1">恢复用户</el-button>
-              <el-button type="warning" @click="disableUserButton(scope.row)" v-if="scope.row.status === 1">禁用用户</el-button>
-              <el-button type="danger" @click="deleteUserButton(scope.row)" v-if="scope.row.status === 1">删除用户</el-button>
+              <el-button type="primary" @click="rowEditButton(scope)">编辑用户</el-button>
+              <el-button type="success" @click="rowResumeButton(scope.row)" v-if="scope.row.status !== 1">恢复用户</el-button>
+              <el-button type="warning" @click="rowDisableButton(scope.row)" v-if="scope.row.status === 1">禁用用户</el-button>
+              <el-button type="danger" @click="rowDeleteButton(scope.row)" v-if="scope.row.status === 1">删除用户</el-button>
             </section>
             <section v-else>超级管理员账户不能被操作</section>
           </template>
@@ -50,34 +52,34 @@
       </el-table>
     </section>
 
-    <el-dialog v-model="editUserDialogVisible" :close-on-click-modal="false" custom-class="edit-user-dialog">
-      <el-form label-width="60px" :model="userRow" style="max-width: 460px">
+    <el-dialog v-model="editDialogVisible" :close-on-click-modal="false" :destroy-on-close="true" custom-class="edit-dialog">
+      <el-form label-width="80px" :model="tableRowData">
         <el-form-item label="用户组:">
-          <el-select v-model="userRow.level">
+          <el-select v-model="tableRowData.level">
             <el-option label="管理员" :value="10"></el-option>
             <el-option label="普通用户" :value="1000"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="账号:">
-          <el-input v-model="userRow.username" maxlength="20"></el-input>
+          <el-input v-model="tableRowData.username" placeholder="请输入账号" maxlength="20"></el-input>
         </el-form-item>
         <el-form-item label="密码:">
-          <el-input v-model="userRow.password" placeholder="登录密码" type="password" maxlength="20"></el-input>
+          <el-input v-model="tableRowData.password" type="password" placeholder="请输入登录密码" maxlength="20"></el-input>
         </el-form-item>
         <el-form-item label="昵称:">
-          <el-input v-model="userRow.nickname" maxlength="20"></el-input>
+          <el-input v-model="tableRowData.nickname" placeholder="请输入昵称，最多可以输入20个字符" maxlength="20"></el-input>
         </el-form-item>
         <el-form-item label="email:">
-          <el-input v-model="userRow.email" maxlength="50"></el-input>
+          <el-input v-model="tableRowData.email" placeholder="请输入邮箱，例：example@xxx.xx" maxlength="50"></el-input>
         </el-form-item>
         <el-form-item label="手机号:">
-          <el-input v-model="userRow.mobile" maxlength="11"></el-input>
+          <el-input v-model="tableRowData.mobile" placeholder="请输入手机号，例：13812345678" maxlength="11"></el-input>
         </el-form-item>
         <el-form-item label="姓名:">
-          <el-input v-model="userRow.fullname" maxlength="20"></el-input>
+          <el-input v-model="tableRowData.fullname" placeholder="请输入姓名" maxlength="20"></el-input>
         </el-form-item>
         <el-form-item label="性别:">
-          <el-select v-model="userRow.gender">
+          <el-select v-model="tableRowData.gender">
             <el-option label="女" :value="0"></el-option>
             <el-option label="男" :value="1"></el-option>
           </el-select>
@@ -85,8 +87,9 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="editUserDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="editUserDialogButton">修改</el-button>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addDialogButton" v-if="dialogMode === 'add'">新增</el-button>
+          <el-button type="primary" @click="editDialogButton" v-else>修改</el-button>
         </span>
       </template>
     </el-dialog>
@@ -96,7 +99,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
-import { userList, editUser } from '@/api/api.js';
+import { addUser as addTableRowApi, userList as getTableDataApi, editUser as editTableRowApi } from '@/api/api.js';
 
 export default {
   name: 'user-manage',
@@ -104,11 +107,11 @@ export default {
   props: {},
   data() {
     return {
-      headForm: {
-        name: '',
-        userGroup: 0,
-        userStatus: 0
-      },
+      headForm: { name: '', userGroup: 0, userStatus: 0 },
+      tableData: [],
+      tableRowData: {},
+      dialogMode: '',
+      editDialogVisible: false,
       userGroup: [
         { label: '全部', value: 0 },
         { label: '管理员', value: 10 },
@@ -119,10 +122,7 @@ export default {
         { label: '正常', value: 1 },
         { label: '禁用', value: 2 },
         { label: '删除', value: 3 }
-      ],
-      userList: [],
-      userRow: {},
-      editUserDialogVisible: false
+      ]
     };
   },
   watch: {},
@@ -138,7 +138,7 @@ export default {
      * 在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。
      * 然而，挂载阶段还没开始，且 el property 目前尚不可用。
      */
-    this.getUserList();
+    this.getTableData();
   },
   beforeMount() {
     /**
@@ -181,31 +181,31 @@ export default {
      */
   },
   methods: {
-    // 获取用户列表
-    getUserList() {
+    // 获取表格数据
+    getTableData() {
       const _this = this;
 
-      userList(_this.headForm).then((response) => {
+      getTableDataApi(_this.headForm).then((response) => {
         const { code, data, message } = response.data;
 
         if (code === 200) {
-          _this.userList = data;
+          _this.tableData = data;
         } else {
           ElMessage.error(message);
         }
       });
     },
-    // 编辑用户
+    // 编辑用户 api
     editUserPost(data) {
       const _this = this;
 
-      editUser(data).then((response) => {
+      editTableRowApi(data).then((response) => {
         const { code, message } = response.data;
 
         if (code === 200) {
           ElMessage.success(message);
-          _this.editUserDialogVisible = false;
-          _this.getUserList();
+          _this.editDialogVisible = false;
+          _this.getTableData();
         } else {
           ElMessage.error(message);
         }
@@ -231,50 +231,107 @@ export default {
     userGender(row) {
       return row.gender === 1 ? '男' : '女';
     },
-    // 重置搜索条件
-    resetSearchButton() {
-      this.headForm = {
-        name: '',
-        userGroup: 0,
-        userStatus: 0
-      };
+    // 头部搜索按钮
+    headSearchButton() {
+      this.getTableData();
     },
-    // 搜索
-    searchButton() {
-      this.getUserList();
+    // 头部重置按钮
+    headResetButton() {
+      this.headForm = { name: '', userGroup: 0, userStatus: 0 };
     },
-    // 编辑用户
-    editUserButton(scope) {
-      this.editUserDialogVisible = true;
-      this.userRow = { index: scope.$index, ...scope.row };
+    // 头部新增按钮
+    headAddButton() {
+      this.tableRowData = { level: 1000, username: '', nickname: '', email: '', mobile: '', fullname: '', gender: 1 };
+      this.dialogMode = 'add';
+      this.editDialogVisible = true;
     },
-    // 恢复用户
-    resumeUserButton(row) {
-      this.editUserPost({
-        type: 1,
-        user_id: row.user_id
-      });
+    // 表格-行-操作-编辑
+    rowEditButton(scope) {
+      this.tableRowData = { index: scope.$index, ...scope.row };
+      this.dialogMode = 'edit';
+      this.editDialogVisible = true;
     },
-    // 禁用用户
-    disableUserButton(row) {
-      this.editUserPost({
-        type: 2,
-        user_id: row.user_id
-      });
+    // 表格-行-操作-恢复
+    rowResumeButton(row) {
+      this.editUserPost({ op_type: 1, user_id: row.user_id });
     },
-    // 删除用户
-    deleteUserButton(row) {
-      this.editUserPost({
-        type: 3,
-        user_id: row.user_id
-      });
+    // 表格-行-操作-禁用
+    rowDisableButton(row) {
+      this.editUserPost({ op_type: 2, user_id: row.user_id });
     },
-    // 弹出 编辑用户
-    editUserDialogButton() {
+    // 表格-行-操作-删除
+    rowDeleteButton(row) {
+      this.editUserPost({ op_type: 3, user_id: row.user_id });
+    },
+    // Dialog-新增
+    addDialogButton() {
       const _this = this;
-      const { index, user_id, username, nickname, email, mobile, fullname, level, gender } = _this.userRow;
+      const { username, password, nickname, email, mobile, fullname, level, gender } = _this.tableRowData;
+
+      if (!level) {
+        ElMessage.error('请选择用户组');
+
+        return;
+      }
+
+      if (!username) {
+        ElMessage.error('账号不能为空');
+
+        return;
+      }
+
+      if (!password) {
+        ElMessage.error('密码不能为空');
+      }
+
+      if (!nickname) {
+        ElMessage.error('昵称不能为空');
+
+        return;
+      }
+
+      if (!email) {
+        ElMessage.error('邮箱不能为空');
+
+        return;
+      }
+
+      if (!mobile) {
+        ElMessage.error('手机不能为空号码');
+
+        return;
+      }
+
+      if (!fullname) {
+        ElMessage.error('姓名不能为空');
+
+        return;
+      }
+
+      if (Number(gender) !== 0 && Number(gender) !== 1) {
+        ElMessage.error('请选择用户性别');
+
+        return;
+      }
+
+      addTableRowApi(_this.tableRowData).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          _this.getTableData();
+          _this.editDialogVisible = false;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // Dialog-编辑
+    editDialogButton() {
+      const _this = this;
+      const { index, user_id, username, nickname, email, mobile, fullname, level, gender } = _this.tableRowData;
       let postData = {
-        type: 0,
+        op_type: 0,
         user_id: user_id
       };
 
@@ -282,7 +339,7 @@ export default {
         ElMessage.error('账号不能为空');
 
         return;
-      } else if (username !== _this.userList[index].username) {
+      } else if (username !== _this.tableData[index].username) {
         postData.username = username;
       }
 
@@ -290,7 +347,7 @@ export default {
         ElMessage.error('昵称不能为空');
 
         return;
-      } else if (nickname !== _this.userList[index].nickname) {
+      } else if (nickname !== _this.tableData[index].nickname) {
         postData.nickname = nickname;
       }
 
@@ -298,7 +355,7 @@ export default {
         ElMessage.error('邮箱不能为空');
 
         return;
-      } else if (email !== _this.userList[index].email) {
+      } else if (email !== _this.tableData[index].email) {
         postData.email = email;
       }
 
@@ -306,7 +363,7 @@ export default {
         ElMessage.error('手机不能为空号码');
 
         return;
-      } else if (mobile !== _this.userList[index].mobile) {
+      } else if (mobile !== _this.tableData[index].mobile) {
         postData.mobile = mobile;
       }
 
@@ -314,23 +371,23 @@ export default {
         ElMessage.error('姓名不能为空');
 
         return;
-      } else if (fullname !== _this.userList[index].fullname) {
+      } else if (fullname !== _this.tableData[index].fullname) {
         postData.fullname = fullname;
       }
 
       // 用户组
-      if (level !== _this.userList[index].level) {
+      if (level !== _this.tableData[index].level) {
         postData.level = level;
       }
 
       // 性别
-      if (gender !== _this.userList[index].gender) {
+      if (gender !== _this.tableData[index].gender) {
         postData.gender = gender;
       }
 
       // 密码
-      if (_this.userRow.password) {
-        postData.password = _this.userRow.password;
+      if (_this.tableRowData.password) {
+        postData.password = _this.tableRowData.password;
       }
 
       if (Object.keys(postData).length > 2) {
@@ -339,11 +396,13 @@ export default {
 
           if (code === 200) {
             ElMessage.success(message);
-            _this.getFriendLinks();
+            _this.getTableData();
           } else {
             ElMessage.error(message);
           }
         });
+      } else {
+        ElMessage.warning('什么都没有更改！');
       }
     }
   }
@@ -373,6 +432,10 @@ export default {
       line-height: 40px;
       color: #606266;
     }
+
+    .el-button:last-of-type {
+      float: right;
+    }
   }
 
   .table-box {
@@ -390,7 +453,7 @@ export default {
   }
 
   :deep {
-    .edit-user-dialog {
+    .edit-dialog {
       position: absolute;
       top: 50%;
       left: 50%;

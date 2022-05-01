@@ -55,6 +55,7 @@ export default [
       { title: '友情链接', name: 'friend-links', path: '/content-manage/friend-links', component: () => import('@/components/content-manage/friend-links/friend-links-page.vue'), children: [] },
       { title: '公告管理', name: 'notice-manage', path: '/content-manage/notice-manage', component: () => import('@/components/content-manage/notice-manage/notice-manage-page.vue'), children: [] },
       { title: '新闻管理', name: 'news-manage', path: '/content-manage/news-manage', component: () => import('@/components/content-manage/news-manage/news-manage-page.vue'), children: [] },
+      { title: '新闻分类管理', name: 'news-type-manage', path: '/content-manage/news-type-manage', component: () => import('@/components/content-manage/news-type-manage/news-type-manage-page.vue'), children: [] },
       { title: '评论管理', name: 'remark-manage', path: '/content-manage/remark-manage', component: () => import('@/components/content-manage/remark-manage/remark-manage-page.vue'), children: [] }
     ]
   }

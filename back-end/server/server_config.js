@@ -8,6 +8,7 @@ const mime = require('mime'); // 文件 mime 类型
 const compression = require('compression'); // 服务端 GZip 压缩
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的表单数据 node.js 中间件，它主要用于上传文件。注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
 
+const Tools = require('../tools/tools.js');
 const Api = require('../controller/api/index.js');
 const { verification } = require('../controller/verification/common-param.js');
 
@@ -135,26 +136,17 @@ class ServerApp {
           callback(null, `./files/image/${file.fieldname}/`);
         },
         filename(request, file, callback) {
-          let currentTime = new Date();
-          let YY = ''.concat('0000', currentTime.getFullYear()).slice(-4);
-          let MM = ''.concat('0000', currentTime.getMonth() + 1).slice(-2);
-          let DD = ''.concat('0000', currentTime.getDate()).slice(-2);
-          let HH = ''.concat('0000', currentTime.getHours()).slice(-2);
-          let mm = ''.concat('0000', currentTime.getMinutes()).slice(-2);
-          let ss = ''.concat('0000', currentTime.getSeconds()).slice(-2);
-          let SSS = ''.concat('0000', currentTime.getMilliseconds()).slice(-3);
-
+          let currentTimeObject = Tools.formatCurrentDate();
+          let currentTime = `${currentTimeObject.YY}${currentTimeObject.MM}${currentTimeObject.DD}${currentTimeObject.HH}${currentTimeObject.mm}${currentTimeObject.ss}${currentTimeObject.SSS}`;
           let fileType = mime.getExtension(file.mimetype);
 
-          callback(null, `${YY}${MM}${DD}${HH}${mm}${ss}${SSS}.${fileType}`);
+          callback(null, `${currentTime}${''.concat('0000000', String(Math.random()).slice(2, 9)).slice(-7)}.${fileType}`);
         }
       }),
       limits: { fileSize: 20971520 /* 字节 */ },
       fileFilter(request, file, callback) {
         // 设置一个函数来控制什么文件可以上传以及什么文件应该跳过
         const { path, query } = request;
-
-        console.log(request,file);
 
         /image\//.test(file.mimetype) && verification({ path, nonce: query.nonce, ts: query.ts, s: query.s }) ? callback(null, true) : callback(null, false);
       }

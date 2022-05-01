@@ -1,3 +1,4 @@
+const { formatCurrentDate } = require('../../../tools/tools.js');
 const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
 const { tokenObject, checkToken } = require('../../verification/token.js');
@@ -26,9 +27,12 @@ module.exports = function (params, callback) {
       return;
     }
 
+    let currentTimeObject = formatCurrentDate();
+    let currentTime = `${currentTimeObject.YY}-${currentTimeObject.MM}-${currentTimeObject.DD} ${currentTimeObject.HH}:${currentTimeObject.mm}:${currentTimeObject.ss}`;
+
     // 验证密码
     if (result[0].password === MD5(password)) {
-      mysql_connection.query(`UPDATE user SET password = '${MD5(newPassword)}', edit_time = '${new Date().toLocaleString()}' WHERE user_id = ${user_id} AND password = '${MD5(password)}'`, function (error, result, fields) {
+      mysql_connection.query(`UPDATE user SET password = '${MD5(newPassword)}', edit_time = '${currentTime}' WHERE user_id = ${user_id} AND password = '${MD5(password)}'`, function (error, result, fields) {
         if (error) {
           console.log('[SELECT ERROR] - ', error.message);
           callback({ code: 10003, message: '[SELECT ERROR] - ', data: { message: error.message } }, {});

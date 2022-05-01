@@ -1,9 +1,9 @@
 <template>
-  <section class="friend-links-wrap">
+  <section class="news-type-manage-wrap">
     <section class="head-box">
-      <el-input v-model="headForm.name" placeholder="名称" clearable></el-input>
+      <el-input v-model="headForm.keyword" placeholder="分类或者关键词" clearable></el-input>
       <el-button type="primary" @click="headSearchButton">搜索</el-button>
-      <el-button type="success" @click="headAddButton">新增友情链接</el-button>
+      <el-button type="success" @click="headAddButton">新增新闻分类</el-button>
     </section>
 
     <section class="table-box">
@@ -11,17 +11,17 @@
         <el-table-column header-align="center" align="center" label="#" width="60">
           <template #default="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
-        <el-table-column header-align="center" align="left" prop="name" label="名称"></el-table-column>
-        <el-table-column header-align="center" align="left" prop="link" label="链接"></el-table-column>
-        <el-table-column header-align="center" align="center" prop="image" label="图片" width="200">
-          <template #default="scope">
-            <img :src="scope.row.image" alt="" class="row-image" />
-          </template>
+        <el-table-column header-align="center" align="center" prop="label" label="分类" width="200"></el-table-column>
+        <el-table-column header-align="center" align="center" prop="edit_time" label="上次修改时间" width="170">
+          <template #default="scope">{{ new Date(scope.row.edit_time).toLocaleString() }}</template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" label="操作" width="200">
+        <el-table-column header-align="center" align="center" prop="create_time" label="公告创建时间" width="170">
+          <template #default="scope">{{ new Date(scope.row.create_time).toLocaleString() }}</template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" label="操作">
           <template #default="scope">
             <el-button type="primary" @click="rowEditButton(scope)">编辑</el-button>
-            <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" :title="'确定要删除【' + scope.row.name + '】吗?'" @confirm="rowDeleteButton(scope.row)">
+            <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" :title="'确定要删除【' + scope.row.label + '】吗?'" @confirm="rowDeleteButton(scope.row)">
               <template #reference>
                 <el-button type="warning">删除</el-button>
               </template>
@@ -33,17 +33,8 @@
 
     <el-dialog v-model="editDialogVisible" :close-on-click-modal="false" :destroy-on-close="true" custom-class="edit-dialog">
       <el-form label-width="80px" :model="tableRowData">
-        <el-form-item label="名称:">
-          <el-input v-model="tableRowData.name" placeholder="请输入友情链接名称"></el-input>
-        </el-form-item>
-        <el-form-item label="网址:">
-          <el-input v-model="tableRowData.link" placeholder="请输入友情链接网址"></el-input>
-        </el-form-item>
-        <el-form-item label="图片:" class="upload-image">
-          <img v-if="tableRowData.image" :src="tableRowData.image" class="image" />
-          <el-upload class="avatar-uploader" :action="uploadImageUrl" :headers="uploadImageHeaders" name="friend-links" :show-file-list="false" list-type="picture" :on-success="imageUploadSuccess" :before-upload="imageUploadBefore">
-            <el-icon class="avatar-uploader-icon"><Plus></Plus></el-icon>
-          </el-upload>
+        <el-form-item label="分类名:">
+          <el-input v-model="tableRowData.label" placeholder="请输入友情链接名称"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -58,18 +49,16 @@
 </template>
 
 <script>
-import MD5 from 'js-md5';
-import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
-import { addFriendLinks as addTableRowApi, friendLinksList as getTableDataApi, editFriendLinks as editTableRowApi } from '@/api/api.js';
+import { addNewsType as addTableRowApi, newsTypeList as getTableDataApi, editNewsType as editTableRowApi } from '@/api/api.js';
 
 export default {
-  name: 'friend-links',
+  name: 'news-type-manage',
   components: {},
   props: {},
   data() {
     return {
-      headForm: { name: '' },
+      headForm: { keyword: '' },
       tableData: [],
       tableRowData: {},
       dialogMode: '',
@@ -77,22 +66,7 @@ export default {
     };
   },
   watch: {},
-  computed: {
-    ...mapGetters(['token']),
-    uploadImageHeaders: function () {
-      return {
-        Authorization: this.token, // 给请求头中添加 Authorization 请求头
-        ['X-Void-Risk']: 1 // 开发、测试环境
-      };
-    },
-    uploadImageUrl: function () {
-      let nonce = String(Math.random()).substring(2); // 随机数
-      let ts = new Date().getTime(); // 时间戳
-      let s = MD5(`/api/upload/image~${nonce}${ts}`); // 签名
-
-      return `//127.0.0.1:12580/api/upload/image?nonce=${nonce}&ts=${ts}&s=${s}`;
-    }
-  },
+  computed: {},
   beforeCreate() {
     /**
      * 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
@@ -167,7 +141,7 @@ export default {
     },
     // 头部新增按钮
     headAddButton() {
-      this.tableRowData = { name: '', link: '', image: '' };
+      this.tableRowData = { label: '' };
       this.dialogMode = 'add';
       this.editDialogVisible = true;
     },
@@ -195,22 +169,10 @@ export default {
     // Dialog-新增
     addDialogButton() {
       const _this = this;
-      const { name, link, image } = _this.tableRowData;
+      const { label } = _this.tableRowData;
 
-      if (!name) {
-        ElMessage.error('名称不能为空');
-
-        return;
-      }
-
-      if (!link) {
-        ElMessage.error('链接不能为空');
-
-        return;
-      }
-
-      if (!image) {
-        ElMessage.error('请上传图片');
+      if (!label) {
+        ElMessage.error('分类名称不能为空');
 
         return;
       }
@@ -230,34 +192,18 @@ export default {
     // Dialog-编辑
     editDialogButton() {
       const _this = this;
-      const { index, id, name, link, image } = _this.tableRowData;
+      const { index, id, label } = _this.tableRowData;
       let postData = {
         op_type: 1,
         id: id
       };
 
-      if (!name) {
-        ElMessage.error('名称不能为空');
+      if (!label) {
+        ElMessage.error('分类名称不能为空');
 
         return;
-      } else if (name !== _this.tableData[index].name) {
-        postData.name = name;
-      }
-
-      if (!link) {
-        ElMessage.error('链接不能为空');
-
-        return;
-      } else if (link !== _this.tableData[index].link) {
-        postData.link = link;
-      }
-
-      if (!image) {
-        ElMessage.error('请上传图片');
-
-        return;
-      } else if (image !== _this.tableData[index].image) {
-        postData.image = image;
+      } else if (label !== _this.tableData[index].label) {
+        postData.label = label;
       }
 
       if (Object.keys(postData).length > 2) {
@@ -275,38 +221,13 @@ export default {
       } else {
         ElMessage.warning('什么都没有更改！');
       }
-    },
-    // 图片上传之前
-    imageUploadBefore(file) {
-      let result = true;
-
-      if (!/image\//.test(file.type)) {
-        result = false;
-        ElMessage.error('请上传图片类型的文件！');
-      }
-
-      return result;
-    },
-    // 图片上传成功
-    imageUploadSuccess(response) {
-      const { code, data, message } = response;
-
-      if (code === 10004) {
-        ElMessage.error(message);
-        this.$router.push('/');
-      } else if (code === 200) {
-        this.tableRowData.image = data.url;
-        ElMessage.success(message);
-      } else {
-        ElMessage.error(message);
-      }
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.friend-links-wrap {
+.news-type-manage-wrap {
   padding: 20px;
   background-color: rgba(255, 255, 255, 0.4);
   border-radius: 5px;
@@ -327,14 +248,6 @@ export default {
     }
   }
 
-  .table-box {
-    .row-image {
-      display: block;
-      margin: 0 auto;
-      height: 40px;
-    }
-  }
-
   :deep {
     .edit-dialog {
       position: absolute;
@@ -348,18 +261,16 @@ export default {
         .el-form {
           .el-form-item:last-of-type {
             margin-bottom: 0;
-          }
 
-          .upload-image {
             .el-form-item__label {
               line-height: 40px;
             }
+          }
 
-            .image {
-              margin-right: 5px;
-              height: 40px;
-              vertical-align: top;
-            }
+          .links-image {
+            margin-right: 5px;
+            height: 40px;
+            vertical-align: top;
           }
 
           .avatar-uploader {

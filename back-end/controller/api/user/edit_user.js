@@ -1,3 +1,4 @@
+const { formatCurrentDate } = require('../../../tools/tools.js');
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
@@ -18,6 +19,8 @@ module.exports = function (params, callback) {
 
   let bodyObject = params.body;
   let extraTermArray = [];
+  let currentTimeObject = formatCurrentDate();
+  let currentTime = `${currentTimeObject.YY}-${currentTimeObject.MM}-${currentTimeObject.DD} ${currentTimeObject.HH}:${currentTimeObject.mm}:${currentTimeObject.ss}`;
 
   /**
    * 0 管理员修改用户信息
@@ -25,23 +28,23 @@ module.exports = function (params, callback) {
    * 2 用户状态设为禁用
    * 3 用户状态设为删除
    */
-  if (bodyObject.type === 0) {
+  if (bodyObject.op_type === 0) {
     for (const key in bodyObject) {
-      if (key === 'type' || key === 'user_id') {
+      if (key === 'op_type' || key === 'user_id') {
         continue;
       } else {
         extraTermArray.push(`${key} = '${bodyObject[key]}'`);
       }
     }
-  } else if (bodyObject.type === 1) {
+  } else if (bodyObject.op_type === 1) {
     extraTermArray.push('status = 1');
-  } else if (bodyObject.type === 2) {
+  } else if (bodyObject.op_type === 2) {
     extraTermArray.push('status = 2');
-  } else if (bodyObject.type === 3) {
+  } else if (bodyObject.op_type === 3) {
     extraTermArray.push('status = 3');
   }
 
-  extraTermArray.push(`edit_time = '${new Date().toLocaleString()}'`);
+  extraTermArray.push(`edit_time = '${currentTime}'`);
 
   let mysqlQueryString = `UPDATE user SET ${extraTermArray.join(', ')} WHERE user_id = ${bodyObject.user_id}`;
 

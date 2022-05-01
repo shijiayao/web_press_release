@@ -1,14 +1,27 @@
 const { formatCurrentDate } = require('../../../tools/tools.js');
 const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
+const { checkToken } = require('../../verification/token.js');
 
 module.exports = function (params, callback) {
-  const { body: data } = params;
+  const { headers, body: data } = params;
+  let userToken = checkToken(headers.authorization);
   let errorFlag = false;
   let code = 200;
   let message = '';
 
-  // 注册不需要验证权限
+  // 新增需要验证权限
+  if (!userToken.status) {
+    callback({}, { code: 10004, message: '登录已失效', data: {} });
+
+    return;
+  }
+
+  if (userToken.level >= 1000) {
+    callback({}, { code: 10007, message: '用户权限不足', data: {} });
+
+    return;
+  }
 
   if (!data.username) {
     message = '账号不能为空';
@@ -99,7 +112,7 @@ module.exports = function (params, callback) {
     mysql_connection.query(
       `INSERT INTO user SET ?`,
       {
-        level: 1000,
+        level: data.level,
         username: data.username,
         password: MD5(data.password),
         nickname: data.nickname,

@@ -16,11 +16,11 @@ module.exports = function (params, callback) {
   let currentTime = `${currentTimeObject.YY}-${currentTimeObject.MM}-${currentTimeObject.DD} ${currentTimeObject.HH}:${currentTimeObject.mm}:${currentTimeObject.ss}`;
 
   mysql_connection.query(
-    `INSERT INTO links SET ?`,
+    `INSERT INTO notice SET ?`,
     {
-      name: data.name,
-      link: data.link,
-      image: data.image,
+      level: data.level,
+      title: data.title,
+      content: data.content,
       edit_time: currentTime,
       create_time: currentTime
     },

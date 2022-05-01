@@ -22,7 +22,7 @@ module.exports = function (params, callback) {
    * 1 修改
    */
   if (data.op_type === 0) {
-    mysqlQueryString = `DELETE FROM links WHERE id = ${data.id}`;
+    mysqlQueryString = `DELETE FROM news_type WHERE id = ${data.id}`;
   } else if (data.op_type === 1) {
     for (const key in data) {
       if (key === 'op_type' || key === 'id') {
@@ -34,10 +34,8 @@ module.exports = function (params, callback) {
 
     extraTermArray.push(`edit_time = '${currentTime}'`);
 
-    mysqlQueryString = `UPDATE links SET ${extraTermArray.join(', ')} WHERE id = ${data.id}`;
+    mysqlQueryString = `UPDATE news_type SET ${extraTermArray.join(', ')} WHERE id = ${data.id}`;
   }
-
-  console.log(mysqlQueryString);
 
   mysql_connection.query(mysqlQueryString, function (error, result) {
     if (error) {
