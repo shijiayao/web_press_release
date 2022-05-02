@@ -2,9 +2,9 @@ const { formatCurrentDate } = require('../../../tools/tools.js');
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
+module.exports = async function (params, callback) {
   const { body: data } = params;
-  let userToken = checkToken(params.headers.authorization);
+  let userToken = await checkToken(params.headers.authorization);
 
   if (!userToken.status) {
     callback({}, { code: 10004, message: '登录已失效', data: {} });

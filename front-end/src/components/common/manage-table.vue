@@ -1,12 +1,10 @@
 <template>
-  <section class="table-list-wrap">
-    TODO:抽离表格作为公共组件
-  </section>
+  <section class="manage-table-wrap">TODO:抽离表格作为公共组件</section>
 </template>
 
 <script>
 export default {
-  name: 'table-list',
+  name: 'manage-table',
   components: {},
   props: {},
   data() {

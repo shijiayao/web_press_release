@@ -40,9 +40,9 @@
           <el-input v-model="tableRowData.link" placeholder="请输入友情链接网址"></el-input>
         </el-form-item>
         <el-form-item label="图片:" class="upload-image">
-          <img v-if="tableRowData.image" :src="tableRowData.image" class="image" />
           <el-upload class="avatar-uploader" :action="uploadImageUrl" :headers="uploadImageHeaders" name="friend-links" :show-file-list="false" list-type="picture" :on-success="imageUploadSuccess" :before-upload="imageUploadBefore">
-            <el-icon class="avatar-uploader-icon"><Plus></Plus></el-icon>
+            <img v-if="tableRowData.image" :src="tableRowData.image" class="image" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus></Plus></el-icon>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -356,24 +356,23 @@ export default {
             }
 
             .image {
-              margin-right: 5px;
               height: 40px;
               vertical-align: top;
             }
-          }
 
-          .avatar-uploader {
-            width: 40px;
-            height: 40px;
-            border: 1px dashed rgb(205, 208, 214);
+            .avatar-uploader {
+              min-width: 40px;
+              height: 40px;
+              border: 1px dashed rgb(205, 208, 214);
 
-            &:hover {
-              border-color: #79bbff;
-            }
+              &:hover {
+                border-color: #79bbff;
+              }
 
-            .el-upload {
-              width: 100%;
-              height: 100%;
+              .el-upload {
+                width: 100%;
+                height: 100%;
+              }
             }
           }
         }

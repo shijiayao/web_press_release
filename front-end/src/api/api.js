@@ -179,3 +179,30 @@ export function editNews(data) {
     data
   });
 }
+
+// 获取用户相关的公告和消息
+export function userNoticeMessage(params) {
+  return Axios.request({
+    url: '/api/base-info/user-notice-message',
+    method: 'get',
+    params
+  });
+}
+
+// 获取新闻分类列表
+export function newsInfoNewsTypeList(params) {
+  return Axios.request({
+    url: '/api/base-info/news-type-list',
+    method: 'get',
+    params
+  });
+}
+
+// 获取新闻列表
+export function newsInfoNewsList(params) {
+  return Axios.request({
+    url: '/api/base-info/news-list',
+    method: 'get',
+    params
+  });
+}

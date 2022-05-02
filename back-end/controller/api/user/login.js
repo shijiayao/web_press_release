@@ -23,7 +23,7 @@ module.exports = function (params, callback) {
       callback({}, { code: 10005, message: '该用户处于非正常状态，请联系管理员', data: { token } });
     } else {
       token = MD5(username + today);
-      tokenObject[token] = { user_id: result[0].user_id, level: result[0].level, expires: today };
+      tokenObject[token] = { user_id: result[0].user_id, expires: today };
       callback({}, { code: 200, message: '登录成功', data: { token } });
     }
   });

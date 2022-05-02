@@ -126,14 +126,14 @@ class ServerApp {
     _this.app.use(express.urlencoded({ limit: '100mb', extended: false }));
 
     // 处理静态资源
-    _this.app.use('/image', express.static('./files/image'));
+    _this.app.use('/static', express.static('./static'));
 
     // 上传文件处理
     // 上传文件使用 multer 中间件，注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
     let upload = multer({
       storage: multer.diskStorage({
         destination(request, file, callback) {
-          callback(null, `./files/image/${file.fieldname}/`);
+          callback(null, `./static/image/${file.fieldname}/`);
         },
         filename(request, file, callback) {
           let currentTimeObject = Tools.formatCurrentDate();

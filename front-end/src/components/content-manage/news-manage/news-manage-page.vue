@@ -59,13 +59,16 @@
           <el-input v-model="tableRowData.title" placeholder="请输入新闻标题"></el-input>
         </el-form-item>
         <el-form-item label="缩略图:" class="upload-image">
-          <img v-if="tableRowData.thumbnail" :src="tableRowData.thumbnail" class="image" />
           <el-upload class="avatar-uploader" :action="uploadImageUrl" :headers="uploadImageHeaders" name="news-info" :show-file-list="false" list-type="picture" :on-success="imageUploadSuccess" :before-upload="imageUploadBefore">
-            <el-icon class="avatar-uploader-icon"><Plus></Plus></el-icon>
+            <img v-if="tableRowData.thumbnail" :src="tableRowData.thumbnail" class="image" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus></Plus></el-icon>
           </el-upload>
+          <p class="info">缩略图是可选的</p>
         </el-form-item>
         <el-form-item label="新闻内容:">
-          <el-input v-model="tableRowData.content" :rows="10" type="textarea" placeholder="请输入新闻内容"></el-input>
+          <!-- <quill-editor v-model="tableRowData.content" placeholder="请输入新闻内容"></quill-editor> -->
+          <section class="editor-toolbar"><button class="ql-upload">upload</button></section>
+          <section class="editor-content"></section>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -80,7 +83,7 @@
     <el-dialog v-model="detailDialogVisible" :destroy-on-close="true" custom-class="show-dialog">
       <h3 class="title">{{ tableRowDetailData.title }}</h3>
       <section class="detail-wrap">
-        <article class="detail-content">{{ tableRowDetailData.content }}</article>
+        <article class="detail-content" v-html="tableRowDetailData.content"></article>
       </section>
       <template #footer>
         <span class="dialog-footer">
@@ -110,10 +113,36 @@ export default {
       editDialogVisible: false,
       tableRowDetailData: {},
       detailDialogVisible: false,
-      newsTypeGroup: []
+      newsTypeGroup: [],
+      editor: null
     };
   },
-  watch: {},
+  watch: {
+    editDialogVisible: {
+      handler(curVal, oldVal) {
+        console.log('监视user对象变化', curVal, curVal === oldVal);
+        if (curVal) {
+          this.$nextTick(() => {
+            this.editor = new window.Quill('.editor-content', {
+              debug: 'warn',
+              theme: 'snow',
+              modules: {
+                toolbar: {
+                  container: '.editor-toolbar',
+                  handlers: {
+                    upload: () => {
+                      console.log(99999);
+                    }
+                  }
+                }
+              },
+              placeholder: '请输入新闻内容'
+            });
+          });
+        }
+      }
+    }
+  },
   computed: {
     ...mapGetters(['token']),
     headNewsTypeGroup() {
@@ -403,6 +432,7 @@ export default {
     .label-text {
       display: inline-block;
       margin-right: 10px;
+      font-size: 14px;
       line-height: 40px;
       color: #606266;
     }
@@ -442,26 +472,38 @@ export default {
             }
 
             .image {
-              margin-right: 5px;
               width: 160px;
               height: 90px;
               vertical-align: top;
             }
+
+            .avatar-uploader {
+              width: 160px;
+              height: 90px;
+              border: 1px dashed rgb(205, 208, 214);
+
+              &:hover {
+                border-color: #79bbff;
+              }
+
+              .el-upload {
+                width: 100%;
+                height: 100%;
+              }
+            }
+
+            .info {
+              margin-left: 15px;
+              color: #606266;
+            }
           }
 
-          .avatar-uploader {
-            width: 160px;
-            height: 90px;
-            border: 1px dashed rgb(205, 208, 214);
+          .editor-toolbar {
+            width: 100%;
+          }
 
-            &:hover {
-              border-color: #79bbff;
-            }
-
-            .el-upload {
-              width: 100%;
-              height: 100%;
-            }
+          .editor-content {
+            width: 100%;
           }
         }
       }

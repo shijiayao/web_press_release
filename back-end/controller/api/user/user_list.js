@@ -1,8 +1,8 @@
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
-  let userToken = checkToken(params.headers.authorization);
+module.exports = async function (params, callback) {
+  let userToken = await checkToken(params.headers.authorization);
 
   if (!userToken.status) {
     callback({}, { code: 10004, message: '登录已失效', data: {} });
@@ -20,7 +20,7 @@ module.exports = function (params, callback) {
   let extraTermArray = [];
 
   if (queryObject.name) {
-    extraTermArray.push(`(username = '${queryObject.name}' OR email = '${queryObject.name}' OR mobile = '${queryObject.name}')`);
+    extraTermArray.push(`(username LIKE '%${queryObject.name}%' OR nickname LIKE '%${queryObject.name}%' OR email LIKE '%${queryObject.name}%' OR mobile LIKE '%${queryObject.name}%' OR fullname LIKE '%${queryObject.name}%')`);
   }
 
   /**

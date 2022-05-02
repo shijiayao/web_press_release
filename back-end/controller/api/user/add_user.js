@@ -3,9 +3,9 @@ const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
+module.exports = async function (params, callback) {
   const { headers, body: data } = params;
-  let userToken = checkToken(headers.authorization);
+  let userToken = await checkToken(headers.authorization);
   let errorFlag = false;
   let code = 200;
   let message = '';

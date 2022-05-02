@@ -3,12 +3,12 @@ const MD5 = require('js-md5');
 const { mysql_connection } = require('../../mysql/index.js');
 const { tokenObject, checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
+module.exports = async function (params, callback) {
   const {
     headers: { authorization },
     body: { user_id, password, newPassword }
   } = params;
-  let userToken = checkToken(authorization);
+  let userToken = await checkToken(authorization);
 
   if (!userToken.status) {
     callback({}, { code: 10004, message: '登录已失效', data: {} });

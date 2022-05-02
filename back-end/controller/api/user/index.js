@@ -1,3 +1,4 @@
+const path = require('path');
 const register = require('./register.js');
 const login = require('./login.js');
 const logout = require('./logout.js');
@@ -7,7 +8,7 @@ const user_list = require('../user/user_list.js');
 const edit_password = require('./edit_password.js');
 const edit_user = require('./edit_user.js');
 
-const primary = 'user';
+const primary = path.basename(__dirname);
 
 module.exports = {
   [`/api/${primary}/register`]: register,

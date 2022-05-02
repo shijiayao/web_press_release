@@ -1,9 +1,9 @@
 const { mysql_connection } = require('../../mysql/index.js');
 const { checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
+module.exports = async function (params, callback) {
   const { headers, body: data } = params;
-  let userToken = checkToken(headers.authorization);
+  let userToken = await checkToken(headers.authorization);
 
   if (!userToken.status) {
     callback({}, { code: 10004, message: '登录已失效', data: {} });

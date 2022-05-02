@@ -40,7 +40,6 @@ export default {
   props: {},
   data() {
     return {
-      menuActive: '/news-info',
       menuList: []
     };
   },
@@ -54,7 +53,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    menuActive() {
+      return this.$route.path;
+    }
   },
   beforeCreate() {
     // 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。

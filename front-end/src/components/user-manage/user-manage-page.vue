@@ -1,7 +1,7 @@
 <template>
   <section class="user-manage-wrap">
     <section class="head-box">
-      <el-input v-model="headForm.name" placeholder="用户名/邮箱/手机号" clearable></el-input>
+      <el-input v-model="headForm.name" placeholder="账号/昵称/邮箱/手机号/姓名" clearable></el-input>
       <p class="label-text">用户组</p>
       <el-select v-model="headForm.userGroup">
         <el-option v-for="item in userGroup" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -429,6 +429,7 @@ export default {
     .label-text {
       display: inline-block;
       margin-right: 10px;
+      font-size: 14px;
       line-height: 40px;
       color: #606266;
     }

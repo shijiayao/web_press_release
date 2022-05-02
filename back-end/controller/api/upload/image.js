@@ -1,11 +1,9 @@
 const { checkToken } = require('../../verification/token.js');
 
-module.exports = function (params, callback) {
-  console.log(params.files);
+module.exports = async function (params, callback) {
+  let userToken = await checkToken(params.headers.authorization);
 
-  let userToken = checkToken(params.headers.authorization);
-
-  let url = '/image/';
+  let url = '/static/image/';
 
   if (!userToken.status) {
     callback({}, { code: 10004, message: '登录已失效', data: {} });

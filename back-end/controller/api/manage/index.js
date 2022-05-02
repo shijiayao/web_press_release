@@ -1,3 +1,4 @@
+const path = require('path');
 const links_list = require('./links_list.js');
 const add_links = require('./add_links.js');
 const edit_links = require('./edit_links.js');
@@ -11,7 +12,7 @@ const news_list = require('./news_list.js');
 const add_news = require('./add_news.js');
 const edit_news = require('./edit_news.js');
 
-const primary = 'manage';
+const primary = path.basename(__dirname);
 
 module.exports = {
   [`/api/${primary}/links_list`]: links_list,

@@ -5,7 +5,6 @@ import { ElMessage } from 'element-plus';
 import MD5 from 'js-md5';
 
 const Axios = axios.create({
-  baseURL: '//127.0.0.1:12580',
   timeout: 5000
 });
 
