@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       activeName: 'login',
-      loginForm: { username: 'admin', password: '123456' },
+      loginForm: { username: '', password: '' },
       registerForm: { username: '', password: '', confirmPassword: '', nickname: '', email: '', mobile: '', fullname: '', gender: -1 }
     };
   },

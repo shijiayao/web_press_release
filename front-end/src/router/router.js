@@ -55,7 +55,7 @@ function formatChildren(childArray, groupArray) {
 }
 
 const routes = [
-  { name: 'login', path: '/login', component: LoginPage, meta: { title: 'login', keepAlive: false } },
+  { name: 'login', path: '/login', component: LoginPage, meta: { title: '登录', keepAlive: false } },
   {
     path: '/',
     component: LayoutMain,
@@ -70,6 +70,8 @@ router.beforeEach(async (to, from, next) => {
   if (Store.state.isLogin && Store.state.userInfo.level >= 20000) {
     await Store.dispatch('getUserInfo');
   }
+
+  document.title = to.meta.title ? to.meta.title : '新闻发布管理系统'
 
   if (Store.state.isLogin) {
     // 已登录
@@ -100,10 +102,8 @@ router.beforeEach(async (to, from, next) => {
     // 未登录
 
     if ([].concat(['/login'], Group_Level_20000, Group_Unlimited).indexOf(to.path) > -1) {
-      console.log(5656);
       next();
     } else {
-      console.log(787878);
       next('/login');
     }
   }
