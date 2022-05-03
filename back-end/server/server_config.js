@@ -33,7 +33,7 @@ class ServerApp {
 
     // server 参数
     this.url = params.url || '127.0.0.1';
-    this.rootPath = params.rootPath || '/'; // 根目录路径
+    this.rootPath = params.rootPath || './'; // 根目录路径
     this.port = 12580; // 要开启服务的端口号
 
     this.init();

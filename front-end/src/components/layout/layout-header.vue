@@ -117,8 +117,8 @@ export default {
 
     .logout-button {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 14px;
+      right: 14px;
     }
   }
 }

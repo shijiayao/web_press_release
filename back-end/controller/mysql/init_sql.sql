@@ -245,4 +245,55 @@ VALUES (
     1005,
     NOW(),
     NOW()
-  )
+  );
+DROP TABLE IF EXISTS remark;
+CREATE TABLE remark (
+  id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  news_id int NOT NULL,
+  user_id int NOT NULL,
+  reply_user_id int,
+  content LONGTEXT NOT NULL,
+  edit_time TIMESTAMP NOT NULL,
+  create_time TIMESTAMP NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+INSERT INTO remark
+VALUES (NULL, 1, 1, NULL, 'NULL, 1, 1, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 1, 2, NULL, 'NULL, 1, 2, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 1, 3, NULL, 'NULL, 1, 3, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 1, 4, NULL, 'NULL, 1, 4, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 1, 5, NULL, 'NULL, 1, 5, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 1, 1, 2, 'NULL, 1, 1, 2, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 1, NULL, 'NULL, 2, 1, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 2, NULL, 'NULL, 2, 2, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 3, NULL, 'NULL, 2, 3, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 4, NULL, 'NULL, 2, 4, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 5, NULL, 'NULL, 2, 5, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 2, 1, 2, 'NULL, 2, 1, 2, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 1, NULL, 'NULL, 3, 1, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 2, NULL, 'NULL, 3, 2, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 3, NULL, 'NULL, 3, 3, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 4, NULL, 'NULL, 3, 4, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 5, NULL, 'NULL, 3, 5, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 3, 1, 2, 'NULL, 3, 1, 2, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 1, NULL, 'NULL, 4, 1, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 2, NULL, 'NULL, 4, 2, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 3, NULL, 'NULL, 4, 3, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 4, NULL, 'NULL, 4, 4, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 5, NULL, 'NULL, 4, 5, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 4, 1, 2, 'NULL, 4, 1, 2, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 1, NULL, 'NULL, 5, 1, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 2, NULL, 'NULL, 5, 2, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 3, NULL, 'NULL, 5, 3, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 4, NULL, 'NULL, 5, 4, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 5, NULL, 'NULL, 5, 5, NULL, 这是一段评论！', NOW(), NOW()),
+  (NULL, 5, 1, 2, 'NULL, 5, 1, 2, 这是一段评论！', NOW(), NOW());
+DROP TABLE IF EXISTS message;
+CREATE TABLE message (
+  id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  news_id int NOT NULL,
+  user_id int NOT NULL,
+  reply_user_id int,
+  content LONGTEXT NOT NULL,
+  edit_time TIMESTAMP NOT NULL,
+  create_time TIMESTAMP NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;

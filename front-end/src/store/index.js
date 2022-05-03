@@ -11,6 +11,9 @@ const Store = createStore({
     };
   },
   mutations: {
+    SET_ISLOGIN(state, data) {
+      state.isLogin = data;
+    },
     SET_TOKEN(state, data) {
       state.token = data;
       state.isLogin = !!state.token;
@@ -53,6 +56,7 @@ const Store = createStore({
             }
           });
         } else {
+          context.commit('SET_ISLOGIN', false);
           reject('用户未登录；未获取到用户 token 缓存');
         }
       });

@@ -30,7 +30,7 @@
         </template>
         <el-card v-for="(item, index) in messageData" :key="item.id" :shadow="item.shadow ? item.shadow : 'hover'" @click="cardClick(index)">
           <h3 class="title">
-            <el-icon><chat-line-round></chat-line-round></el-icon><span>{{ item.title }}</span>
+            <el-icon><chat-line-round></chat-line-round></el-icon><span>{{ item.reply_user_name }}回复了你的评论</span>
           </h3>
           <section class="content-height" :style="{ height: item.height + 'px' }">
             <section class="content-wrap" ref="box">
@@ -133,8 +133,7 @@ export default {
 
         if (code === 200) {
           _this.noticeData = data.notice;
-          _this.messageData = data.message; // TODO:
-          _this.messageData = data.notice; // TODO:
+          _this.messageData = data.message;
         } else {
           ElMessage.error(message);
         }
@@ -257,14 +256,15 @@ export default {
 
         .el-card {
           margin-bottom: 10px;
-
           cursor: pointer;
 
           .title {
             position: relative;
+            margin-bottom: 0;
             padding-left: 25px;
             line-height: 24px;
             font-size: 16px;
+            transition: all 0.8s;
 
             .el-icon {
               position: absolute;

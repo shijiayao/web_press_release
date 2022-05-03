@@ -13,10 +13,10 @@
         </el-table-column>
         <el-table-column header-align="center" align="center" prop="label" label="分类" width="200"></el-table-column>
         <el-table-column header-align="center" align="center" prop="edit_time" label="上次修改时间" width="170">
-          <template #default="scope">{{ new Date(scope.row.edit_time).toLocaleString() }}</template>
+          <template #default="scope">{{ formatDate(scope.row.edit_time) }}</template>
         </el-table-column>
         <el-table-column header-align="center" align="center" prop="create_time" label="公告创建时间" width="170">
-          <template #default="scope">{{ new Date(scope.row.create_time).toLocaleString() }}</template>
+          <template #default="scope">{{ formatDate(scope.row.create_time) }}</template>
         </el-table-column>
         <el-table-column header-align="center" align="center" label="操作">
           <template #default="scope">
@@ -50,6 +50,7 @@
 
 <script>
 import { ElMessage } from 'element-plus';
+import { formatTargetDate } from '@/tools/tools.js';
 import { addNewsType as addTableRowApi, newsTypeList as getTableDataApi, editNewsType as editTableRowApi } from '@/api/api.js';
 
 export default {
@@ -134,6 +135,11 @@ export default {
           ElMessage.error(message);
         }
       });
+    },
+    // 序列化时间
+    formatDate(date) {
+      let targetTimeObject = formatTargetDate(date);
+      return `${targetTimeObject.YY}-${targetTimeObject.MM}-${targetTimeObject.DD} ${targetTimeObject.HH}:${targetTimeObject.mm}:${targetTimeObject.ss}`;
     },
     // 头部搜索按钮
     headSearchButton() {

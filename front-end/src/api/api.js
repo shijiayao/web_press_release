@@ -189,20 +189,29 @@ export function userNoticeMessage(params) {
   });
 }
 
-// 获取新闻分类列表
-export function newsInfoNewsTypeList(params) {
+// 新增用户评论
+export function addRemark(data) {
   return Axios.request({
-    url: '/api/base-info/news-type-list',
+    url: '/api/remark/add-remark',
+    method: 'post',
+    data
+  });
+}
+
+// 获取用户评论列表
+export function remarkList(params) {
+  return Axios.request({
+    url: '/api/remark/remark-list',
     method: 'get',
     params
   });
 }
 
-// 获取新闻列表
-export function newsInfoNewsList(params) {
+// 编辑用户评论
+export function editRemark(data) {
   return Axios.request({
-    url: '/api/base-info/news-list',
-    method: 'get',
-    params
+    url: '/api/remark/edit-remark',
+    method: 'post',
+    data
   });
 }

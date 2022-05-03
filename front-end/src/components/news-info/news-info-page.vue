@@ -26,7 +26,21 @@
       </template>
       <section class="main-content">
         <section class="left-wrap">
-          <section class="left-box"></section>
+          <section class="left-box">
+            <h2 class="title">友情链接</h2>
+            <ul class="links-list">
+              <li class="links-item" v-for="item in linksList" :key="item.id">
+                <a :href="item.link" target="_blank">
+                  <el-card shadow="hover">
+                    <section class="image-box">
+                      <img :src="item.image" alt="" />
+                    </section>
+                    <p class="name">{{ item.name }}</p>
+                  </el-card>
+                </a>
+              </li>
+            </ul>
+          </section>
         </section>
         <section class="right-wrap">
           <h3 class="title">{{ newsDetailData.title }}</h3>
@@ -39,17 +53,59 @@
           </section>
         </section>
       </section>
-      <section class="">
-        666666666666666666666
+      <section class="remark-wrap">
+        <section class="remark-box">
+          <section class="remark-input" v-if="isLogin">
+            <el-input v-model="remarkObject.remark" :rows="5" type="textarea" resize="none" placeholder="发表神妙评论"></el-input>
+            <el-button type="primary" @click="remarkButton">发表评论</el-button>
+          </section>
+          <section class="no-login" v-else>
+            <p>游客，你还有登录，登录之后即可参与精彩评论</p>
+            <el-button type="primary" @click="$router.push('/login')">快去登录</el-button>
+          </section>
+          <ul class="remark-list">
+            <li class="item" v-for="(item, index) in remarkList" :key="item.id">
+              <section class="avatar-box">
+                <img src="/static/image/other/202205031426578052518998.png" alt="" />
+              </section>
+              <section class="remark-detail">
+                <p class="name-info">
+                  <span class="name">{{ item.user_name }}</span>
+                  <span class="middle-text" v-if="item.reply_user_name">回复了</span>
+                  <span class="name" v-if="item.reply_user_name">{{ item.reply_user_name }}</span>
+                </p>
+                <p class="detail">{{ item.content }}</p>
+                <p class="reply">
+                  <span class="time">{{ formatDate(item.edit_time) }}</span>
+                  <el-button v-if="!item.reply" type="text" class="reply-button" @click="replyButton(item, index)">
+                    <el-icon><chat-line-square></chat-line-square></el-icon>回复
+                  </el-button>
+                  <el-button v-else type="text" class="reply-button" @click="item.reply = false">取消回复</el-button>
+                </p>
+                <section class="reply-module" v-if="item.reply">
+                  <section class="remark-input" v-if="isLogin">
+                    <el-input v-model="remarkObject.reply" :rows="5" type="textarea" resize="none" :placeholder="'回复【' + item.user_name + '】'"></el-input>
+                    <el-button type="primary" @click="remarkReplyButton">回复【{{ item.user_name }}】</el-button>
+                  </section>
+                  <section class="no-login" v-else>
+                    <p>游客，你还有登录，登录之后即可参与精彩评论</p>
+                    <el-button type="primary" @click="$router.push('/login')">快去登录</el-button>
+                  </section>
+                </section>
+              </section>
+            </li>
+          </ul>
+        </section>
       </section>
     </el-dialog>
   </section>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
 import { formatTargetDate } from '@/tools/tools.js';
-import { newsInfoNewsTypeList, newsInfoNewsList } from '@/api/api.js';
+import { friendLinksList, newsTypeList, newsList, remarkList, addRemark } from '@/api/api.js';
 
 export default {
   name: 'news-info',
@@ -57,14 +113,22 @@ export default {
   props: {},
   data() {
     return {
-      newsList: [],
+      linksList: [],
       newsTypeGroup: [],
+      newsList: [],
+      remarkList: [],
       newsDetailData: {},
+      remarkObject: {
+        news_id: 0,
+        reply_user_id: 0,
+        remark: '',
+        reply: ''
+      },
       detailDialogVisible: false
     };
   },
   watch: {},
-  computed: {},
+  computed: { ...mapGetters(['isLogin', 'userInfo']) },
   beforeCreate() {
     /**
      * 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
@@ -76,6 +140,7 @@ export default {
      * 在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。
      * 然而，挂载阶段还没开始，且 el property 目前尚不可用。
      */
+    this.getLinksList();
     this.getNewsTypeList();
     this.getNewsList();
   },
@@ -120,11 +185,25 @@ export default {
      */
   },
   methods: {
+    // 获取友情链接列表
+    getLinksList() {
+      const _this = this;
+
+      friendLinksList().then((response) => {
+        const { code, data, message } = response.data;
+
+        if (code === 200) {
+          _this.linksList = data;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
     // 获取新闻分类
     getNewsTypeList() {
       const _this = this;
 
-      newsInfoNewsTypeList().then((response) => {
+      newsTypeList().then((response) => {
         const { code, data, message } = response.data;
 
         if (code === 200) {
@@ -138,11 +217,33 @@ export default {
     getNewsList() {
       const _this = this;
 
-      newsInfoNewsList().then((response) => {
+      newsList().then((response) => {
         const { code, data, message } = response.data;
 
         if (code === 200) {
           _this.newsList = data;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // 获取新闻的评论数据
+    getRemarkList() {
+      const _this = this;
+
+      remarkList({ news_id: _this.newsDetailData.id }).then((response) => {
+        const { code, data, message } = response.data;
+
+        if (code === 200) {
+          _this.remarkList = data;
+
+          _this.remarkList.forEach((element) => {
+            element.reply = false;
+          });
+
+          _this.remarkList.sort((a, b) => {
+            return new Date(b.edit_time).getTime() - new Date(a.edit_time).getTime();
+          });
         } else {
           ElMessage.error(message);
         }
@@ -154,7 +255,7 @@ export default {
 
       return resultArray[0].label;
     },
-    // 序列化新闻时间
+    // 序列化时间
     formatDate(date) {
       let targetTimeObject = formatTargetDate(date);
       return `${targetTimeObject.YY}-${targetTimeObject.MM}-${targetTimeObject.DD} ${targetTimeObject.HH}:${targetTimeObject.mm}:${targetTimeObject.ss}`;
@@ -162,7 +263,68 @@ export default {
     // 新闻详情点击
     newsItemClick(item) {
       this.newsDetailData = item;
+      this.remarkObject.news_id = item.id;
+      this.getRemarkList();
       this.detailDialogVisible = true;
+    },
+    // 新闻详情页 评论新闻
+    remarkButton() {
+      const _this = this;
+
+      if (!_this.remarkObject.remark) {
+        ElMessage.error('评论内容不能为空');
+      }
+
+      addRemark({
+        news_id: _this.remarkObject.news_id,
+        content: _this.remarkObject.remark
+      }).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          _this.remarkObject.remark = '';
+          _this.getRemarkList();
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // 新闻详情页 回复别人按钮
+    replyButton(item, idx) {
+      const _this = this;
+
+      this.remarkObject.reply_user_id = item.user_id;
+
+      _this.remarkList.forEach((element, index) => {
+        if (idx === index) {
+          element.reply = true;
+        } else {
+          element.reply = false;
+        }
+      });
+    },
+    // 回复别人评论
+    remarkReplyButton() {
+      const _this = this;
+
+      if (!_this.remarkObject.reply) {
+        ElMessage.error('回复的内容不能为空');
+      }
+
+      addRemark({
+        news_id: _this.remarkObject.news_id,
+        reply_user_id: _this.remarkObject.reply_user_id,
+        content: _this.remarkObject.reply
+      }).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          _this.remarkObject.reply = '';
+          _this.getRemarkList();
+        } else {
+          ElMessage.error(message);
+        }
+      });
     }
   }
 };
@@ -289,8 +451,49 @@ export default {
             .left-box {
               position: fixed;
               width: 400px;
-              height: 500px;
-              background-color: red;
+
+              .title {
+                margin-bottom: 10px;
+                color: #222;
+                text-align: center;
+              }
+
+              .links-list {
+                .links-item {
+                  margin-bottom: 5px;
+
+                  a {
+                    display: block;
+                    width: 100%;
+                  }
+
+                  .el-card__body {
+                    padding: 5px 20px;
+                    overflow: hidden;
+
+                    .image-box {
+                      float: left;
+                      width: 258px;
+                      height: 40px;
+
+                      img {
+                        display: block;
+                        margin: 0 auto;
+                        height: 100%;
+                      }
+                    }
+
+                    p {
+                      float: right;
+                      width: 100px;
+                      line-height: 40px;
+                      font-size: 16px;
+                      color: #777;
+                      text-align: center;
+                    }
+                  }
+                }
+              }
             }
           }
 
@@ -310,7 +513,7 @@ export default {
               color: #999;
 
               span {
-                margin-right: 5px;
+                margin-right: 10px;
               }
             }
 
@@ -329,6 +532,103 @@ export default {
 
                   &:last-of-type {
                     margin-bottom: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .remark-wrap {
+          width: 100%;
+
+          .remark-box {
+            padding: 20px;
+            padding-left: 440px;
+
+            .remark-input {
+              text-align: right;
+
+              .el-textarea {
+                margin-bottom: 10px;
+              }
+            }
+
+            .no-login {
+              text-align: center;
+              padding: 20px 0;
+              border: 1px solid #eee;
+              border-radius: 5px;
+
+              p {
+                margin-bottom: 10px;
+                font-size: 16px;
+                color: #555;
+              }
+            }
+
+            .remark-list {
+              margin-top: 20px;
+
+              .item {
+                margin-bottom: 20px;
+
+                .avatar-box {
+                  float: left;
+                  width: 60px;
+                  height: 60px;
+
+                  img {
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                  }
+                }
+
+                .remark-detail {
+                  padding-left: 10px;
+                  min-height: 80px;
+                  overflow: hidden;
+
+                  .name-info {
+                    margin-bottom: 10px;
+                    font-size: 14px;
+
+                    .name {
+                      color: #222;
+                      font-weight: bold;
+                    }
+
+                    .middle-text {
+                      margin: 0 5px;
+                      color: #999;
+                    }
+                  }
+
+                  .reply {
+                    margin-top: 10px;
+                    height: 20px;
+                    line-height: 20px;
+
+                    .time {
+                      line-height: 20px;
+                      color: #9195a3;
+                    }
+
+                    .reply-button {
+                      float: right;
+                      padding: 0;
+                      height: 20px;
+                      line-height: 20px;
+
+                      .el-icon {
+                        margin-right: 3px;
+                      }
+                    }
+                  }
+
+                  .remark-input {
+                    margin-top: 10px;
                   }
                 }
               }

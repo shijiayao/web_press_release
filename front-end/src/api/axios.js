@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus';
 import MD5 from 'js-md5';
 
 const Axios = axios.create({
-  timeout: 5000
+  timeout: 10000
 });
 
 // 添加请求拦截器

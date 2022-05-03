@@ -24,7 +24,7 @@
         <section class="item-inner">{{ userGender }}</section>
       </el-form-item>
       <el-form-item label="创建时间:">
-        <section class="item-inner">{{ new Date(userInfo.create_time).toLocaleString() }}</section>
+        <section class="item-inner">{{ formatDate(userInfo.create_time) }}</section>
       </el-form-item>
     </el-form>
   </section>
@@ -32,6 +32,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { formatTargetDate } from '@/tools/tools.js';
 
 export default {
   name: 'user-info',
@@ -86,7 +87,13 @@ export default {
   unmounted() {
     // 实例销毁后调用。该钩子被调用后，对应 Vue 实例的所有指令都被解绑，所有的事件监听器被移除，所有的子实例也都被销毁。
   },
-  methods: {}
+  methods: {
+    // 序列化时间
+    formatDate(date) {
+      let targetTimeObject = formatTargetDate(date);
+      return `${targetTimeObject.YY}-${targetTimeObject.MM}-${targetTimeObject.DD} ${targetTimeObject.HH}:${targetTimeObject.mm}:${targetTimeObject.ss}`;
+    }
+  }
 };
 </script>
 

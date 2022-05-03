@@ -1,31 +1,76 @@
 <template>
   <section class="remark-manage-wrap">
     <section class="head-box">
-      <el-input v-model="headForm.name" placeholder="用户" clearable></el-input>
+      <el-input v-model="headForm.nickname" placeholder="用户昵称关键词" clearable></el-input>
       <el-input v-model="headForm.keyword" placeholder="评论中内容关键词" clearable></el-input>
-      <p class="label-text">用户组</p>
-      <el-select v-model="headForm.userGroup">
-        <el-option v-for="item in userGroup" :key="item.value" :label="item.label" :value="item.value"></el-option>
-      </el-select>
-      <p class="label-text">用户状态</p>
-      <el-select v-model="headForm.userStatus">
-        <el-option v-for="item in userStatus" :key="item.value" :label="item.label" :value="item.value"></el-option>
-      </el-select>
       <el-button type="primary" @click="headSearchButton">搜索</el-button>
       <el-button type="warning" @click="headResetButton">重置搜索条件</el-button>
-      <el-button type="success" @click="headAddButton">新增用户</el-button>
     </section>
+
+    <section class="table-box">
+      <el-table size="default" :data="tableData" border style="width: 100%" empty-text="没有数据" @cell-click="tableCellClick">
+        <el-table-column header-align="center" align="center" label="#" width="60">
+          <template #default="scope">{{ scope.$index + 1 }}</template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" prop="user_name" label="发表评论用户昵称" width="180"></el-table-column>
+        <el-table-column header-align="center" align="center" prop="reply_user_name" label="被回复的用户昵称" width="180"></el-table-column>
+        <el-table-column header-align="center" align="left" prop="content" label="内容"></el-table-column>
+        <el-table-column header-align="center" align="center" prop="edit_time" label="上次修改时间" width="170">
+          <template #default="scope">{{ formatDate(scope.row.edit_time) }}</template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" prop="create_time" label="评论时间" width="170">
+          <template #default="scope">{{ formatDate(scope.row.create_time) }}</template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" label="操作" width="200">
+          <template #default="scope">
+            <el-button type="primary" @click="rowEditButton(scope)">编辑</el-button>
+            <el-popconfirm confirm-button-text="是" cancel-button-text="否" icon-color="red" :title="'确定要删除【' + scope.row.user_name + '】发布的评论吗?'" @confirm="rowDeleteButton(scope.row)">
+              <template #reference>
+                <el-button type="warning">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </section>
+
+    <el-dialog v-model="editDialogVisible" :close-on-click-modal="false" :destroy-on-close="true" custom-class="edit-dialog">
+      <el-form label-width="80px" :model="tableRowData">
+        <section class="title">
+          <span class="name">{{ tableRowData.user_name }}</span>
+          <span class="text" v-if="tableRowData.reply_user_name" style="margin-right: 5px">回复</span>
+          <span class="name" v-if="tableRowData.reply_user_name">{{ tableRowData.reply_user_name }}</span>
+          <span class="text" v-if="!tableRowData.reply_user_name">发布</span>
+          <span class="text">的评论</span>
+        </section>
+
+        <el-form-item label="内容:">
+          <el-input v-model="tableRowData.content" :rows="10" type="textarea" placeholder="请输入公告信息内容"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addDialogButton" v-if="dialogMode === 'add'">新增</el-button>
+          <el-button type="primary" @click="editDialogButton" v-else>修改</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
 <script>
+import { ElMessage } from 'element-plus';
+import { formatTargetDate } from '@/tools/tools.js';
+import { remarkList as getTableDataApi, editRemark as editTableRowApi } from '@/api/api.js';
+
 export default {
   name: 'remark-manage',
   components: {},
   props: {},
   data() {
     return {
-      headForm: { name: '', keyword: '', userGroup: 0, userStatus: 0 },
+      headForm: { nickname: '', keyword: '' },
       tableData: [],
       tableRowData: {},
       dialogMode: '',
@@ -45,6 +90,7 @@ export default {
      * 在这一步中，实例已完成对选项的处理，意味着以下内容已被配置完毕：数据侦听、计算属性、方法、事件/侦听器的回调函数。
      * 然而，挂载阶段还没开始，且 el property 目前尚不可用。
      */
+    this.getTableData();
   },
   beforeMount() {
     /**
@@ -86,7 +132,106 @@ export default {
      * 该钩子在服务器端渲染期间不被调用。
      */
   },
-  methods: {}
+  methods: {
+    // 获取表格数据
+    getTableData() {
+      const _this = this;
+
+      getTableDataApi(_this.headForm).then((response) => {
+        const { code, data, message } = response.data;
+
+        if (code === 200) {
+          _this.tableData = data;
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // 用户组
+    userLevel(row) {
+      let result = '所有用户';
+
+      if (row.level < 1000) {
+        result = '管理员';
+      }
+
+      return result;
+    },
+    // 序列化时间
+    formatDate(date) {
+      let targetTimeObject = formatTargetDate(date);
+      return `${targetTimeObject.YY}-${targetTimeObject.MM}-${targetTimeObject.DD} ${targetTimeObject.HH}:${targetTimeObject.mm}:${targetTimeObject.ss}`;
+    },
+    // 头部搜索按钮
+    headSearchButton() {
+      this.getTableData();
+    },
+    // 头部重置按钮
+    headResetButton() {
+      this.headForm = { nickname: '', keyword: '' };
+    },
+    // 表格-单元格点击
+    tableCellClick(row, column) {
+      if (column.property === 'title' || column.property === 'content') {
+        this.tableRowDetailData = { title: row.title, content: row.content };
+        this.detailDialogVisible = true;
+      }
+    },
+    // 表格-行-操作-编辑
+    rowEditButton(scope) {
+      this.tableRowData = { index: scope.$index, ...scope.row };
+      this.dialogMode = 'edit';
+      this.editDialogVisible = true;
+    },
+    // 表格-行-操作-删除
+    rowDeleteButton(row) {
+      const _this = this;
+
+      editTableRowApi({ op_type: 0, id: row.id }).then((response) => {
+        const { code, message } = response.data;
+
+        if (code === 200) {
+          ElMessage.success(message);
+          _this.getTableData();
+        } else {
+          ElMessage.error(message);
+        }
+      });
+    },
+    // Dialog-编辑
+    editDialogButton() {
+      const _this = this;
+      const { index, id, content } = _this.tableRowData;
+      let postData = {
+        op_type: 1,
+        id: id
+      };
+
+      if (!content) {
+        ElMessage.error('评论内容不能为空');
+
+        return;
+      } else if (content !== _this.tableData[index].content) {
+        postData.content = content;
+      }
+
+      if (Object.keys(postData).length > 2) {
+        editTableRowApi(postData).then((response) => {
+          const { code, message } = response.data;
+
+          if (code === 200) {
+            ElMessage.success(message);
+            _this.getTableData();
+            _this.editDialogVisible = false;
+          } else {
+            ElMessage.error(message);
+          }
+        });
+      } else {
+        ElMessage.warning('什么都没有更改！');
+      }
+    }
+  }
 };
 </script>
 
@@ -113,6 +258,78 @@ export default {
       font-size: 14px;
       line-height: 40px;
       color: #606266;
+    }
+  }
+
+  :deep {
+    .edit-dialog {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0;
+      transform: translate(-50%, -50%);
+      width: 1200px;
+
+      .el-dialog__body {
+        .el-form {
+          .el-form-item:last-of-type {
+            margin-bottom: 0;
+          }
+
+          .title {
+            margin-bottom: 20px;
+            padding-left: 80px;
+            font-size: 20px;
+
+            .name {
+              margin-right: 5px;
+              color: #222;
+              font-weight: bold;
+            }
+
+            .text {
+              color: #999;
+            }
+          }
+        }
+      }
+    }
+
+    .show-dialog {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: 0;
+      transform: translate(-50%, -50%);
+      width: 1200px;
+
+      .el-dialog__body {
+        .title {
+          padding: 5px 0 10px;
+          font-size: 20px;
+          text-align: center;
+        }
+
+        .detail-wrap {
+          max-height: 500px;
+          overflow-y: auto;
+
+          .detail-content {
+            font-size: 0;
+
+            p {
+              margin-bottom: 10px;
+              font-size: 16px;
+              line-height: 1.5;
+              text-indent: 2em;
+
+              &:last-of-type {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

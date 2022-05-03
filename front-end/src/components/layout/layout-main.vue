@@ -3,7 +3,7 @@
     <el-container class="layout-main-container">
       <el-header><layoutHeader></layoutHeader></el-header>
       <el-container>
-        <el-aside width="240px"><layoutLefNav></layoutLefNav></el-aside>
+        <el-aside width="240px" v-if="isLogin"><layoutLefNav></layoutLefNav></el-aside>
         <el-main><router-view></router-view></el-main>
       </el-container>
     </el-container>

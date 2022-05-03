@@ -30,10 +30,10 @@
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="center" prop="edit_time" label="上次修改时间" width="170">
-          <template #default="scope">{{ new Date(scope.row.edit_time).toLocaleString() }}</template>
+          <template #default="scope">{{ formatDate(scope.row.edit_time) }}</template>
         </el-table-column>
         <el-table-column header-align="center" align="center" prop="create_time" label="新闻创建时间" width="170">
-          <template #default="scope">{{ new Date(scope.row.create_time).toLocaleString() }}</template>
+          <template #default="scope">{{ formatDate(scope.row.create_time) }}</template>
         </el-table-column>
         <el-table-column header-align="center" align="center" label="操作" width="200">
           <template #default="scope">
@@ -98,6 +98,7 @@
 import MD5 from 'js-md5';
 import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
+import { formatTargetDate } from '@/tools/tools.js';
 import { newsTypeList, addNews as addTableRowApi, newsList as getTableDataApi, editNews as editTableRowApi } from '@/api/api.js';
 
 export default {
@@ -231,7 +232,7 @@ export default {
         }
       });
     },
-    // 获取公告列表
+    // 获取表格数据
     getTableData() {
       const _this = this;
 
@@ -244,6 +245,11 @@ export default {
           ElMessage.error(message);
         }
       });
+    },
+    // 序列化时间
+    formatDate(date) {
+      let targetTimeObject = formatTargetDate(date);
+      return `${targetTimeObject.YY}-${targetTimeObject.MM}-${targetTimeObject.DD} ${targetTimeObject.HH}:${targetTimeObject.mm}:${targetTimeObject.ss}`;
     },
     // 表格-新闻分类
     newsType(row) {
@@ -529,8 +535,18 @@ export default {
           overflow-y: auto;
 
           .detail-content {
-            font-size: 16px;
-            line-height: 2;
+            font-size: 0;
+
+            p {
+              margin-bottom: 10px;
+              font-size: 16px;
+              line-height: 1.5;
+              text-indent: 2em;
+
+              &:last-of-type {
+                margin-bottom: 0;
+              }
+            }
           }
         }
       }
