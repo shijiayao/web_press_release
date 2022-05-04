@@ -37,8 +37,6 @@ module.exports = async function (params, callback) {
     mysqlQueryString = `UPDATE news SET ${extraTermArray.join(', ')} WHERE id = ${data.id}`;
   }
 
-  console.log(mysqlQueryString);
-
   mysql_connection.query(mysqlQueryString, function (error, result) {
     if (error) {
       console.log('[SELECT ERROR] - ', error.message);

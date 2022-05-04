@@ -4,14 +4,18 @@
       <el-tab-pane>
         <template #label>
           <span class="custom-tabs-label">
-            <el-icon><bell-filled></bell-filled></el-icon>
+            <el-icon>
+              <bell-filled></bell-filled>
+            </el-icon>
             <span>公告</span>
           </span>
         </template>
         <el-collapse accordion>
           <el-collapse-item v-for="item in noticeData" :key="item.id" :name="item.id">
             <template #title>
-              <el-icon><bell-filled></bell-filled></el-icon>
+              <el-icon>
+                <bell-filled></bell-filled>
+              </el-icon>
               <h3 class="title">{{ item.title }}</h3>
             </template>
             <section class="content-wrap">
@@ -24,21 +28,28 @@
       <el-tab-pane>
         <template #label>
           <span class="custom-tabs-label">
-            <el-icon><chat-line-round></chat-line-round></el-icon>
+            <el-icon>
+              <chat-line-round></chat-line-round>
+            </el-icon>
             <span>消息</span>
           </span>
         </template>
-        <el-card v-for="(item, index) in messageData" :key="item.id" :shadow="item.shadow ? item.shadow : 'hover'" @click="cardClick(index)">
-          <h3 class="title">
-            <el-icon><chat-line-round></chat-line-round></el-icon><span>{{ item.reply_user_name }}回复了你的评论</span>
-          </h3>
-          <section class="content-height" :style="{ height: item.height + 'px' }">
-            <section class="content-wrap" ref="box">
-              <p class="content-info">{{ formatDate(item.edit_time) }}</p>
-              <article class="content" v-html="showDetailContent(item.content)"></article>
+        <section v-if="messageData.length > 0">
+          <el-card v-for="(item, index) in messageData" :key="item.id" :shadow="item.shadow ? item.shadow : 'hover'" @click="cardClick(index)">
+            <h3 class="title">
+              <el-icon>
+                <chat-line-round></chat-line-round>
+              </el-icon><span>{{ item.reply_user_name }}回复了你的评论</span>
+            </h3>
+            <section class="content-height" :style="{ height: item.height + 'px' }">
+              <section class="content-wrap" ref="box">
+                <p class="content-info">{{ formatDate(item.edit_time) }}</p>
+                <article class="content" v-html="showDetailContent(item.content)"></article>
+              </section>
             </section>
-          </section>
-        </el-card>
+          </el-card>
+        </section>
+        <p v-else>暂时没有消息</p>
       </el-tab-pane>
     </el-tabs>
   </section>

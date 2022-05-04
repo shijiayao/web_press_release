@@ -390,7 +390,7 @@ export default {
     },
     // 子组件 编辑器 设置 content
     childModuleSetTableRowData(content) {
-      this.tableRowData.content = content;
+      this.tableRowData.content = content.replace(/(<p)(\s+?[\s|\S]+?)(>)/gi, '$1$3').replace(/(<br><\/br>)|(<br[\s|\S]*?>)/gi, '').replace(/(<p><\/p>)/gi, '')
     },
   }
 };
