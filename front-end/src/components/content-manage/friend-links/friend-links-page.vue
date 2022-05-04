@@ -90,7 +90,7 @@ export default {
       let ts = new Date().getTime(); // 时间戳
       let s = MD5(`/api/upload/image~${nonce}${ts}`); // 签名
 
-      return `//127.0.0.1:12580/api/upload/image?nonce=${nonce}&ts=${ts}&s=${s}`;
+      return `/api/upload/image?nonce=${nonce}&ts=${ts}&s=${s}`;
     }
   },
   beforeCreate() {

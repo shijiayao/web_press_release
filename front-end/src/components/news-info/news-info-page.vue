@@ -6,7 +6,9 @@
           <section class="left-box">
             <img v-if="item.thumbnail" :src="item.thumbnail" alt="" />
             <p v-else class="no-thumbnail">
-              <el-icon><calendar></calendar></el-icon>
+              <el-icon>
+                <calendar></calendar>
+              </el-icon>
             </p>
           </section>
           <section class="right-box">
@@ -78,7 +80,9 @@
                 <p class="reply">
                   <span class="time">{{ formatDate(item.edit_time) }}</span>
                   <el-button v-if="!item.reply" type="text" class="reply-button" @click="replyButton(item, index)">
-                    <el-icon><chat-line-square></chat-line-square></el-icon>回复
+                    <el-icon>
+                      <chat-line-square></chat-line-square>
+                    </el-icon>回复
                   </el-button>
                   <el-button v-else type="text" class="reply-button" @click="item.reply = false">取消回复</el-button>
                 </p>
@@ -532,6 +536,12 @@ export default {
 
                   &:last-of-type {
                     margin-bottom: 0;
+                  }
+
+                  img {
+                    display: block;
+                    margin: 0 auto;
+                    max-width: 100%;
                   }
                 }
               }

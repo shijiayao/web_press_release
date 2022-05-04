@@ -76,6 +76,7 @@ router.beforeEach(async (to, from, next) => {
   if (Store.state.isLogin) {
     // 已登录
 
+    // 判断权限
     if (Store.state.userInfo.level < 1000) {
       // 管理员
       if ([].concat(Group_Admin, Group_ordinary, Group_Level_10000, Group_Level_20000).indexOf(to.path) > -1) {

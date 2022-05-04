@@ -179,7 +179,8 @@ class ServerApp {
             if (error.code) {
               response.json({ code: error.code, message: error.message, data: error.data || {} });
             } else {
-              response.json({ code: success.code, message: success.message, data: success.data || {} });
+              // errno editor 上传图片返回字段
+              response.json({ code: success.code, message: success.message, data: success.data || {}, errno: 0 });
             }
           });
         }

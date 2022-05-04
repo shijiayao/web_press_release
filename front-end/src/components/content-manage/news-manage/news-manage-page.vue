@@ -61,14 +61,16 @@
         <el-form-item label="缩略图:" class="upload-image">
           <el-upload class="avatar-uploader" :action="uploadImageUrl" :headers="uploadImageHeaders" name="news-info" :show-file-list="false" list-type="picture" :on-success="imageUploadSuccess" :before-upload="imageUploadBefore">
             <img v-if="tableRowData.thumbnail" :src="tableRowData.thumbnail" class="image" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus></Plus></el-icon>
+            <el-icon v-else class="avatar-uploader-icon">
+              <Plus></Plus>
+            </el-icon>
           </el-upload>
           <p class="info">缩略图是可选的</p>
         </el-form-item>
         <el-form-item label="新闻内容:">
-          <!-- <quill-editor v-model="tableRowData.content" placeholder="请输入新闻内容"></quill-editor> -->
-          <section class="editor-toolbar"><button class="ql-upload">upload</button></section>
-          <section class="editor-content"></section>
+          <section class="editor-box">
+            <editor-module :contentData="tableRowData" :token="token" @setContent="childModuleSetTableRowData"></editor-module>
+          </section>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -100,10 +102,11 @@ import { mapGetters } from 'vuex';
 import { ElMessage } from 'element-plus';
 import { formatTargetDate } from '@/tools/tools.js';
 import { newsTypeList, addNews as addTableRowApi, newsList as getTableDataApi, editNews as editTableRowApi } from '@/api/api.js';
+import editorModule from '@/components/common/editor-module.vue';
 
 export default {
   name: 'news-manage',
-  components: {},
+  components: { editorModule },
   props: {},
   data() {
     return {
@@ -118,32 +121,7 @@ export default {
       editor: null
     };
   },
-  watch: {
-    editDialogVisible: {
-      handler(curVal, oldVal) {
-        console.log('监视user对象变化', curVal, curVal === oldVal);
-        if (curVal) {
-          this.$nextTick(() => {
-            this.editor = new window.Quill('.editor-content', {
-              debug: 'warn',
-              theme: 'snow',
-              modules: {
-                toolbar: {
-                  container: '.editor-toolbar',
-                  handlers: {
-                    upload: () => {
-                      console.log(99999);
-                    }
-                  }
-                }
-              },
-              placeholder: '请输入新闻内容'
-            });
-          });
-        }
-      }
-    }
-  },
+  watch: {},
   computed: {
     ...mapGetters(['token']),
     headNewsTypeGroup() {
@@ -160,7 +138,7 @@ export default {
       let ts = new Date().getTime(); // 时间戳
       let s = MD5(`/api/upload/image~${nonce}${ts}`); // 签名
 
-      return `//127.0.0.1:12580/api/upload/image?nonce=${nonce}&ts=${ts}&s=${s}`;
+      return `/api/upload/image?nonce=${nonce}&ts=${ts}&s=${s}`;
     }
   },
   beforeCreate() {
@@ -335,7 +313,7 @@ export default {
     // Dialog-编辑
     editDialogButton() {
       const _this = this;
-      const { index, id, title, content, type } = _this.tableRowData;
+      const { index, id, title, content, thumbnail, type } = _this.tableRowData;
       let postData = {
         op_type: 1,
         id: id
@@ -363,6 +341,10 @@ export default {
         return;
       } else if (content !== _this.tableData[index].content) {
         postData.content = content;
+      }
+
+      if (thumbnail !== _this.tableData[index].thumbnail) {
+        postData.thumbnail = thumbnail;
       }
 
       if (Object.keys(postData).length > 2) {
@@ -405,7 +387,11 @@ export default {
       } else {
         ElMessage.error(message);
       }
-    }
+    },
+    // 子组件 编辑器 设置 content
+    childModuleSetTableRowData(content) {
+      this.tableRowData.content = content;
+    },
   }
 };
 </script>
@@ -504,12 +490,10 @@ export default {
             }
           }
 
-          .editor-toolbar {
+          .editor-box {
             width: 100%;
-          }
-
-          .editor-content {
-            width: 100%;
+            max-height: 800px;
+            border: 1px solid #000;
           }
         }
       }
@@ -540,11 +524,18 @@ export default {
             p {
               margin-bottom: 10px;
               font-size: 16px;
+              width: 100%;
               line-height: 1.5;
               text-indent: 2em;
 
               &:last-of-type {
                 margin-bottom: 0;
+              }
+
+              img {
+                display: block;
+                margin: 0 auto;
+                max-width: 100%;
               }
             }
           }
