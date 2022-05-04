@@ -2,7 +2,7 @@ module.exports = {
   host: 'localhost',
   port: 33306,
   user: 'root',
-  password: '123456',
+  password: '$fouQ73tn!@xGd',
   database: 'web_press_release',
   insecureAuth: true
 };
