@@ -1,26 +1,31 @@
 <template>
   <section class="news-info-wrap">
-    <ul class="news-list">
-      <li class="news-item" v-for="item in newsList" :key="item.uk">
-        <section class="item-box" @click="newsItemClick(item)">
-          <section class="left-box">
-            <img v-if="item.thumbnail" :src="item.thumbnail" alt="" />
-            <p v-else class="no-thumbnail">
-              <el-icon>
-                <calendar></calendar>
-              </el-icon>
-            </p>
-          </section>
-          <section class="right-box">
-            <h3 class="title">{{ item.title }}</h3>
-            <p class="info">
-              <span>{{ newsTypeLabel(item.type) }}</span>
-              <span>{{ formatDate(item.edit_time) }}</span>
-            </p>
-          </section>
-        </section>
-      </li>
-    </ul>
+    <el-tabs v-model="activeName">
+      <el-tab-pane v-for="item in headNewsTypeGroup" :key="item.value" :label="item.label" :name="item.value">
+        <ul class="news-list" v-if="newsObject[activeName].length > 0">
+          <li class="news-item" v-for="item in newsObject[activeName]" :key="item.uk">
+            <section class="item-box" @click="newsItemClick(item)">
+              <section class="left-box">
+                <img v-if="item.thumbnail" :src="item.thumbnail" alt="" />
+                <p v-else class="no-thumbnail">
+                  <el-icon>
+                    <calendar></calendar>
+                  </el-icon>
+                </p>
+              </section>
+              <section class="right-box">
+                <h3 class="title">{{ item.title }}</h3>
+                <p class="info">
+                  <span>{{ newsTypeLabel(item.type) }}</span>
+                  <span>{{ formatDate(item.edit_time) }}</span>
+                </p>
+              </section>
+            </section>
+          </li>
+        </ul>
+        <p v-else>{{ item.label }}分类下暂时没有新闻</p>
+      </el-tab-pane>
+    </el-tabs>
 
     <el-dialog v-model="detailDialogVisible" :destroy-on-close="true" custom-class="show-dialog">
       <template #title>
@@ -82,7 +87,8 @@
                   <el-button v-if="!item.reply" type="text" class="reply-button" @click="replyButton(item, index)">
                     <el-icon>
                       <chat-line-square></chat-line-square>
-                    </el-icon>回复
+                    </el-icon>
+                    回复
                   </el-button>
                   <el-button v-else type="text" class="reply-button" @click="item.reply = false">取消回复</el-button>
                 </p>
@@ -117,6 +123,7 @@ export default {
   props: {},
   data() {
     return {
+      activeName: 0,
       linksList: [],
       newsTypeGroup: [],
       newsList: [],
@@ -132,7 +139,27 @@ export default {
     };
   },
   watch: {},
-  computed: { ...mapGetters(['isLogin', 'userInfo']) },
+  computed: {
+    ...mapGetters(['isLogin', 'userInfo']),
+    headNewsTypeGroup() {
+      return [].concat([{ label: '全部', value: 0 }], this.newsTypeGroup);
+    },
+    newsObject() {
+      let resultObject = {
+        0: this.newsList
+      };
+
+      this.newsTypeGroup.forEach((element) => {
+        resultObject[element.value] = [];
+      });
+
+      this.newsList.forEach((element) => {
+        resultObject[element.type].push(element);
+      });
+
+      return resultObject;
+    }
+  },
   beforeCreate() {
     /**
      * 在实例初始化之后，进行数据侦听和事件/侦听器的配置之前同步调用。
@@ -344,7 +371,7 @@ export default {
     width: 100%;
 
     .news-item {
-      padding: 10px;
+      padding: 10px 0;
 
       .item-box {
         cursor: pointer;
@@ -553,8 +580,7 @@ export default {
           width: 100%;
 
           .remark-box {
-            padding: 20px;
-            padding-left: 440px;
+            padding: 20px 20px 20px 440px;
 
             .remark-input {
               text-align: right;
